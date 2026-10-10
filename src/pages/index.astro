@@ -1,63 +1,46 @@
 ---
-import { getEmDashEntry, getEmDashCollection } from "emdash";
 import Base from "../layouts/Base.astro";
-import MarketingBlocks from "../components/MarketingBlocks.astro";
-import images from "../components/blocks/images";
-
-
-const { entry: page, cacheHint } = await getEmDashEntry("pages", "home");
-const { entries: newsItems, cacheHint: newsCacheHint } = await getEmDashCollection("news", {
-  status: "published",
-  orderBy: { date: "desc" },
-  limit: 5,
-});
-
-try {
-  Astro.cache.set(cacheHint);
-  Astro.cache.set(newsCacheHint);
-} catch {}
-
-const pageTitle = page?.data.title;
-const pageContent = page?.data.content;
+import HeroCarousel from "../components/HeroCarousel.astro";
+import {
+  taizanLogo,
+  indexCarousel,
+  thumbnailImages,
+  hachiojiStationImage,
+} from "../components/blocks/images";
 ---
 
 <Base
-  title={pageTitle !== "Home" ? pageTitle : undefined}
-  description="泰山流護身術・逮捕術 - Peaceful Mountain System"
+  description="東京八王子本部道場。合気柔術・柔道・空手を融合した実践的な護身術・逮捕術と、武道の知識を活かした指圧整体。初心者・体験稽古歓迎。"
 >
-  {
-    pageContent && (
-      <MarketingBlocks value={pageContent} />
-    )
-  }
 
-  <div class="container" id="home">
-    
-    <section class="hero-carousel">
-      <div class="carousel-images">
-        <img src="https://pub-488a24026ed4411b8d591260b603cdd1.r2.dev/dojo/DOJO_04.webp" alt="Dojo 04" class="carousel-slide active" decoding="async" />
-        <img src="https://pub-488a24026ed4411b8d591260b603cdd1.r2.dev/dojo/DOJO_08.webp" alt="Dojo 08" class="carousel-slide" loading="lazy" decoding="async" />
-        <img src="https://pub-488a24026ed4411b8d591260b603cdd1.r2.dev/dojo/DOJO_07.webp" alt="Dojo 07" class="carousel-slide" loading="lazy" decoding="async" />
-      </div>
-      
-      <div class="carousel-overlay"></div>
+  <div id="home">
+    <HeroCarousel images={indexCarousel} alt="八王子本部道場での稽古風景">
+      <h1 class="hero-title">
+        <span class="line-1">
+          <span class="ja">泰山流護身術・逮捕術</span>
+          <span class="en">Peaceful Mountain System</span>
+        </span><br>
+        <span class="line-2">
+          <span class="ja">-東京八王子本部道場-</span>
+          <span class="en">-Tokyo Hachioji Head Quarter Dojo-</span>
+        </span>
+      </h1>
+      <h2 class="hero-subtitle">Taizan-ryu Martial Arts</h2>
+      <p class="hero-author">
+        <span class="ja">守破離の精神で、真の護身を。</span>
+        <span class="en">True self-defense through Shu-Ha-Ri.</span>
+      </p>
+    </HeroCarousel>
+  </div>
 
-      <div class="carousel-content">
-        <h1 class="hero-title">
-          <span class="line-1"><span class="ja">泰山流護身術・逮捕術</span><span class="en">Taizan-ryu Martial Arts</span></span><br>
-          <span class="line-2"><span class="ja">- 東京八王子本部道場 -</span><span class="en">- Tokyo Hachioji Main Dojo -</span></span>
-        </h1>
-        <h2 class="hero-subtitle">Peaceful Mountain System</h2>
-        <p class="hero-author"><span class="ja">守破離の精神で、真の護身を。</span><span class="en">True self-defense through Shu-Ha-Ri.</span></p>
-      </div>
-    </section>
+  <div class="container">
 
 <section class="features-section" id="features">
       <div class="feature-grid">
         
         <a href="/self-defense" class="feature-card reveal">
           <div class="feature-image-wrapper">
-            <img src="https://pub-488a24026ed4411b8d591260b603cdd1.r2.dev/dojo/DOJO_05.webp" alt="柔術稽古" />
+            <img src={thumbnailImages[0]} alt="柔術稽古" />
           </div>
           <div class="feature-text">
             <h2><span class="ja">泰山流護身術・逮捕術</span><span class="en">Taizan-ryu Martial Arts</span></h2>
@@ -68,7 +51,7 @@ const pageContent = page?.data.content;
 
         <a href="/shiatsu" class="feature-card reveal">
           <div class="feature-image-wrapper">
-            <img src="https://pub-488a24026ed4411b8d591260b603cdd1.r2.dev/shiatsu/SHIATSU_DO_02.webp" alt="指圧治療院" />
+            <img src={thumbnailImages[1]} alt="指圧治療院" />
           </div>
           <div class="feature-text">
             <h2><span class="ja">泰山流指圧整体院</span><span class="en">Taizan-ryu Shiatsu Clinic</span></h2>
@@ -79,7 +62,7 @@ const pageContent = page?.data.content;
 
         <a href="/soke" class="feature-card reveal">
           <div class="feature-image-wrapper">
-            <img src="https://pub-488a24026ed4411b8d591260b603cdd1.r2.dev/biography/SOKE_JOE_MILLER.webp" alt="宗家ジョー・ミラー" />
+            <img src={thumbnailImages[2]} alt="宗家ジョー・ミラー" />
           </div>
           <div class="feature-text">
             <h2><span class="ja">宗家について</span><span class="en">About the Soke</span></h2>
@@ -120,7 +103,7 @@ const pageContent = page?.data.content;
     <section class="emblem surface-light" id="emblem">
       <div class="banner-image">
         <img
-                src={ images.taizanLogo }
+                src={ taizanLogo }
                 alt="泰山流のロゴ"
         />
       </div>
@@ -131,7 +114,7 @@ const pageContent = page?.data.content;
         <dt class="reveal">
           <span class="work-num">1</span>
           <img
-                src={ images.newyorkSeminar1 }
+                src={ thumbnailImages[3] }
                 alt="国境を越えて集う仲間たち"
           />
         </dt>
@@ -144,7 +127,7 @@ const pageContent = page?.data.content;
         <dt class="reveal">
           <span class="work-num">2</span>
           <img
-                src={ images.heroDojoTraining }
+                src={ thumbnailImages[4] }
                 alt="稽古仲間たち"
           />
         </dt>
@@ -157,7 +140,7 @@ const pageContent = page?.data.content;
         <dt class="reveal">
           <span class="work-num">3</span>
           <img
-                src={ images.homeTaizanLogoPlaceholder }
+                src={ thumbnailImages[5] }
                 alt="泰山流のロゴ"
           />
         </dt>
@@ -174,7 +157,7 @@ const pageContent = page?.data.content;
       <h3><span class="ja">アクセス</span><span class="en">Location</span></h3>
       <div class="access-hero">
         <img
-          src={ images.hachiojiStationImage }
+          src={ hachiojiStationImage }
           alt="八王子駅"
         />
       </div>
@@ -197,18 +180,6 @@ const pageContent = page?.data.content;
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    // カルーセル
-    const slides = document.querySelectorAll('.carousel-slide');
-    if (slides.length > 0) {
-      let currentSlide = 0;
-      function nextSlide() {
-        slides[currentSlide].classList.remove('active');
-        currentSlide = (currentSlide + 1) % slides.length;
-        slides[currentSlide].classList.add('active');
-      }
-      setInterval(nextSlide, 5000);
-    }
-
     // Google Maps 言語切り替え
     const mapIframe = document.getElementById('map-iframe') as HTMLIFrameElement | null;
     if (mapIframe) {
@@ -304,27 +275,10 @@ const pageContent = page?.data.content;
     }
   }
 
-  /* --- ヒーローカルーセル (全画面幅) --- */
-  .hero-carousel {
-    position: relative;
-    width: 100vw;
-    height: 100vh; 
-    left: 50%;
-    transform: translateX(-50%); 
-    margin-top: -100px;
-    margin-bottom: 80px;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  /* --- container は hero の直後に来るため padding-top 不要 --- */
+  .container {
+    padding-top: 0;
   }
-
-  .carousel-images { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
-  .carousel-slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 1.5s ease-in-out; }
-  .carousel-slide.active { opacity: 1; }
-  .carousel-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 2; }
-
-  .carousel-content { position: relative; z-index: 3; text-align: center; color: #ffffff; padding: 0 20px; }
 
   .hero-title, .hero-subtitle, .hero-author {
     opacity: 0;
@@ -352,7 +306,6 @@ const pageContent = page?.data.content;
     .line-1 { font-size: 2rem; }
     .line-2 { font-size: 1.1rem; }
     .hero-subtitle { font-size: 1rem; }
-    .hero-carousel { height: 60vh; margin-bottom: 40px; }
 
     .features-section,
     .featured-works {

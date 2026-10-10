@@ -1,22 +1,16 @@
 ---
 import Base from "../layouts/Base.astro";
-import { getEmDashCollection } from "emdash";
-import { getCloudflareStreamUrl } from "../components/blocks/videos";
-import { shiatsuReviewsHeroBg } from "../components/blocks/images";
+import { getR2PosterUrl, getR2VideoUrl, shiatsuTestimonialsData } from "../components/blocks/videos";
+import { clientLetters, shiatsuImages } from "../components/blocks/images";
 
-const { entries: allVideos, cacheHint } = await getEmDashCollection("videos", { limit: 100 });
-try { Astro.cache.set(cacheHint); } catch {}
-
-const testimonialVideos = allVideos
-  .filter(v => v.data.category === "shiatsu-testimonial")
-  .sort((a, b) => {
-    const aOrder = Number((a.data as any).sort_order ?? 0);
-    const bOrder = Number((b.data as any).sort_order ?? 0);
-    if (aOrder > 0 && bOrder > 0) return aOrder - bOrder;
-    if (aOrder > 0) return -1;
-    if (bOrder > 0) return 1;
-    return a.id.localeCompare(b.id);
-  });
+const testimonialVideos = [...shiatsuTestimonialsData].sort((a, b) => {
+  const aOrder = a.order ?? 0;
+  const bOrder = b.order ?? 0;
+  if (aOrder > 0 && bOrder > 0) return aOrder - bOrder;
+  if (aOrder > 0) return -1;
+  if (bOrder > 0) return 1;
+  return a.id - b.id;
+});
 ---
 
 <Base
@@ -27,9 +21,10 @@ const testimonialVideos = allVideos
   <!-- ヒーローセクション -->
   <section class="ts-hero">
     <img
-      src={shiatsuReviewsHeroBg}
+      src={shiatsuImages[0]}
       alt="泰山流指圧整体院"
       class="ts-hero-bg"
+      fetchpriority="high"
     />
     <div class="ts-hero-overlay"></div>
     <div class="ts-hero-content">
@@ -62,19 +57,21 @@ const testimonialVideos = allVideos
     </div>
   </section>
 
-  <!-- 動画ギャラリー -->
-  <section class="ts-videos surface-light">
+  <!-- 動画 -->
+  <section class="ts-videos surface-white">
     <div class="ts-grid-wrap">
       <div class="ts-grid">
         {testimonialVideos.map((v, i) => (
           <div class="ts-item reveal" style={`animation-delay: ${(i % 4) * 80}ms`}>
             <div class="ts-video-wrap">
-              <iframe
-                src={getCloudflareStreamUrl(v.data.cloudflare_video_id, false, Number(v.data.thumbnail_time))}
-                title={v.data.title_jp}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen
-              ></iframe>
+              <video
+                data-src={v.r2File ? getR2VideoUrl("testimonials", v.r2File) : undefined}
+                poster={v.r2File ? getR2PosterUrl("testimonials", v.r2File) : undefined}
+                title={v.titleJP}
+                controls
+                preload="none"
+                playsinline
+              ></video>
             </div>
           </div>
         ))}
@@ -82,7 +79,74 @@ const testimonialVideos = allVideos
     </div>
   </section>
 
+  <!-- レター -->
+  <section class="ts-letters surface-light">
+    <div class="ts-grid-wrap">
+      <div class="ts-lead-content reveal">
+        <h2><span class="ja">お客様からの手紙</span><span class="en">Letters from Clients</span></h2>
+        <p class="ja">
+          施術を受けたお客様からいただいた感謝の手紙をご紹介します。
+          体調が改善した喜びや、日常生活が楽になったという声を多数いただいています。
+          個人の感想であり、効果を保証するものではありません。
+        </p>
+        <p class="en">
+          We would like to share some of the heartfelt letters we have received from our clients.
+          Many have expressed their joy at improved health and how their daily lives have become easier.
+          These are personal experiences and do not guarantee outcomes.
+        </p>
+      </div>
+      <div class="ts-grid reveal">
+        {clientLetters.map((letter, i) => (
+          <img
+            src={letter}
+            alt={`お客様からの手紙 ${i + 1}`}
+            style={`animation-delay: ${(i % 4) * 80}ms`}
+            loading="lazy"
+          />
+        ))}
+      </div>
+    </div>
+  </section>
+
 </Base>
+
+<script>
+  const timers = new Map<Element, ReturnType<typeof setTimeout>>();
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        const video = entry.target as HTMLVideoElement;
+        const shouldLoad = entry.isIntersecting;
+
+        const existing = timers.get(video);
+        if (existing) clearTimeout(existing);
+
+        timers.set(
+          video,
+          setTimeout(() => {
+            timers.delete(video);
+            if (shouldLoad) {
+              if (video.dataset.src && !video.src) {
+                video.src = video.dataset.src;
+                video.load();
+              }
+            } else {
+              video.pause();
+              video.removeAttribute("src");
+              video.load();
+            }
+          }, 300)
+        );
+      });
+    },
+    { rootMargin: "300px 0px" }
+  );
+
+  document.querySelectorAll<HTMLVideoElement>("video[data-src]").forEach((el) => {
+    observer.observe(el);
+  });
+</script>
 
 <style>
   /* ===== 共通 ===== */
@@ -187,6 +251,7 @@ const testimonialVideos = allVideos
     height: 60px;
     background: linear-gradient(to bottom, rgba(255,255,255,0.5), transparent);
     margin: 0 auto;
+    transform-origin: top;
     animation: tsScrollLine 2s ease-in-out infinite;
   }
 
@@ -196,9 +261,9 @@ const testimonialVideos = allVideos
   }
 
   @keyframes tsScrollLine {
-    0%   { transform: scaleY(0); transform-origin: top; opacity: 1; }
-    50%  { transform: scaleY(1); transform-origin: top; opacity: 1; }
-    100% { transform: scaleY(1); transform-origin: top; opacity: 0; }
+    0%   { transform: scaleY(0); opacity: 1; }
+    50%  { transform: scaleY(1); opacity: 1; }
+    100% { transform: scaleY(1); opacity: 0; }
   }
 
   /* ===== リード文 ===== */
@@ -252,7 +317,7 @@ const testimonialVideos = allVideos
   .ts-video-wrap {
     position: relative;
     width: 100%;
-    padding-top: 177.78%;
+    aspect-ratio: 9 / 16;
     border-radius: 8px;
     overflow: hidden;
     background-color: #0a0705;
@@ -265,19 +330,39 @@ const testimonialVideos = allVideos
     transform: translateY(-4px);
   }
 
-  .ts-video-wrap iframe {
+  .ts-video-wrap video {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     border: none;
+    object-fit: cover;
+    background-color: #0a0705;
   }
 
-  .ts-item-label {
-    font-size: 0.75rem;
-    letter-spacing: 1.5px;
-    color: var(--text-secondary);
-    padding-left: 4px;
+  /* ===== レターギャラリー ===== */
+  .ts-letters {
+    padding: 60px 0 100px;
+  }
+
+  .ts-letters .ts-lead-content {
+    margin-bottom: 48px;
+  }
+
+  .ts-letters .ts-grid img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    transition: box-shadow 0.4s ease, transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .ts-letters .ts-grid img:hover {
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+    transform: translateY(-4px);
   }
 
   /* ===== レスポンシブ ===== */

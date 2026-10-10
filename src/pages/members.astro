@@ -1,52 +1,33 @@
 ---
 import Base from "../layouts/Base.astro";
-import { getEmDashCollection } from "emdash";
 import { membersGroupImage, logoImage } from "../components/blocks/images";
-
-const { entries: members, cacheHint } = await getEmDashCollection("members", {
-  limit: 100,
-});
-try { Astro.cache.set(cacheHint); } catch {}
+import { members } from "../data/members";
 
 const now = new Date();
 const dateJa = `${now.getFullYear()}年${now.getMonth() + 1}月現在`;
 const dateEn = now.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+
+import HeroCarousel from "../components/HeroCarousel.astro";
 ---
 
 <Base
   title="門下生"
   description="泰山流護身術・逮捕術の門下生たち。世界各国から集まった仲間が、東京八王子本部道場で共に稽古に励んでいます。"
 >
-
-  <!-- タイトルセクション -->
-  <section class="mb-title">
-    <div class="mb-inner">
-      <div class="mb-title-content reveal">
-        <p class="mb-eyebrow">Taizan-ryu</p>
-        <h1 class="mb-title-text"><span class="ja">門下生</span><span class="en">Members</span></h1>
-        <p class="mb-title-sub">Members</p>
-        <div class="mb-divider"></div>
-        <p class="mb-title-desc ja">
-          世界各国から集まった仲間たちが、守破離の精神のもとで共に稽古に励んでいます。
-          国籍・年齢・経験を超えた絆が、泰山流道場を一層豊かなものにしています。
-        </p>
-        <p class="mb-title-desc en">
-          Students from around the world train together in the spirit of Shu-Ha-Ri.
-          Bonds that transcend nationality, age, and experience make Taizan-ryu Dojo all the richer.
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ヒーローセクション -->
-  <section class="mb-hero">
-    <img
-      src={membersGroupImage}
-      alt="泰山流道場 門下生たち"
-      class="mb-hero-bg"
-    />
-    <div class="mb-hero-overlay"></div>
-  </section>
+  <!-- ヒーロー -->
+  <HeroCarousel images={[membersGroupImage]} alt="泰山流門下生" objectPosition="center -70%">
+    <p class="sd-eyebrow">Taizan-ryu</p>
+    <h1 class="sh-hero-title">
+      <span class="line-a">
+        <span class="ja">門下生たち</span>
+        <span class="en">Members</span>
+      </span>
+    </h1>
+    <p class="sd-hero-sub">
+      <span class="ja">世界各国から集まった、泰山流の仲間たち</span>
+      <span class="en">Students from around the world, united in Taizanryu</span>
+    </p>
+  </HeroCarousel> 
 
   <!-- リストセクション -->
   <section class="mb-list surface-light">
@@ -85,82 +66,6 @@ const dateEn = now.toLocaleString('en-US', { month: 'long', year: 'numeric' });
     max-width: 1100px;
     margin: 0 auto;
     padding: 0 40px;
-  }
-
-  /* ===== タイトルセクション ===== */
-  .mb-title {
-    padding: calc(var(--header-height) + 80px) 0 80px;
-    background-color: var(--bg-color);
-    text-align: center;
-  }
-
-  .mb-title-content {
-    max-width: 640px;
-    margin: 0 auto;
-  }
-
-  .mb-eyebrow {
-    font-size: 0.8rem;
-    letter-spacing: 5px;
-    text-transform: uppercase;
-    color: var(--text-secondary);
-    margin-bottom: 20px;
-  }
-
-  .mb-title-text {
-    font-size: clamp(3rem, 6vw, 5rem);
-    font-weight: 600;
-    letter-spacing: 8px;
-    line-height: 1;
-    margin-bottom: 12px;
-  }
-
-  .mb-title-sub {
-    font-size: 0.85rem;
-    letter-spacing: 5px;
-    color: var(--text-secondary);
-    margin-bottom: 40px;
-  }
-
-  .mb-divider {
-    width: 40px;
-    height: 1px;
-    background-color: rgba(255, 255, 255, 0.3);
-    margin: 0 auto 40px;
-  }
-
-  .mb-title-desc {
-    font-size: 0.95rem;
-    line-height: 2;
-    color: var(--text-secondary);
-  }
-
-  /* ===== ヒーローセクション ===== */
-  .mb-hero {
-    position: relative;
-    width: 100%;
-    height: 60vh;
-    min-height: 360px;
-    overflow: hidden;
-  }
-
-  .mb-hero-bg {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center 30%;
-  }
-
-  .mb-hero-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-      to bottom,
-      rgba(107, 31, 35, 0.3) 0%,
-      rgba(0, 0, 0, 0.5) 100%
-    );
   }
 
   /* ===== リストセクション ===== */

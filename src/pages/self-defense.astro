@@ -1,26 +1,14 @@
 ---
 import Base from "../layouts/Base.astro";
-import { getEmDashCollection } from "emdash";
-import { getCloudflareStreamUrl } from "../components/blocks/videos";
+import { getR2PosterUrl, getR2VideoUrl, martialArtsTechniquesData } from "../components/blocks/videos";
+import {
+  selfDefenseHeroBgs,
+  selfDefenseCertificates,
+} from "../components/blocks/images";
 
-const { entries: allVideos,    cacheHint: videosCacheHint }  = await getEmDashCollection("videos",       { limit: 100 });
-const { entries: certificates, cacheHint: certsCacheHint }   = await getEmDashCollection("certificates", { status: "published", orderBy: { order: "asc" }, limit: 100 });
-const { entries: photos,       cacheHint: galleryCacheHint } = await getEmDashCollection("gallery",      { status: "published", orderBy: { order: "asc" }, limit: 100 });
+const martialArtsVideos = martialArtsTechniquesData;
 
-const martialArtsVideos = allVideos.filter(v => v.data.category === "martial-arts");
-
-try {
-  Astro.cache.set(videosCacheHint);
-  Astro.cache.set(certsCacheHint);
-  Astro.cache.set(galleryCacheHint);
-} catch {}
-
-// 3列のグリッドに分割
-const COLS = 3;
-const rows: (typeof photos)[] = [];
-for (let i = 0; i < photos.length; i += COLS) {
-  rows.push(photos.slice(i, i + COLS));
-}
+import HeroCarousel from "../components/HeroCarousel.astro";
 ---
 
 <Base
@@ -28,26 +16,16 @@ for (let i = 0; i < photos.length; i += COLS) {
   description="泰山流護身術・逮捕術 — 東京八王子本部道場。合気柔術・柔道・空手の精髄を融合した実践的な護身術システム。初心者から経験者まで歓迎。"
 >
 
-  <!-- ヒーローセクション -->
-  <section class="sd-hero">
-    <img
-      src="https://pub-488a24026ed4411b8d591260b603cdd1.r2.dev/dojo/DOJO_07.webp"
-      alt="泰山流道場稽古"
-      class="sd-hero-bg"
-    />
-    <div class="sd-hero-overlay"></div>
-    <div class="sd-hero-content">
-      <p class="sd-eyebrow">Taizan-ryu</p>
-      <h1 class="sd-hero-title">
-        <span class="line-a"><span class="ja">護身術</span><span class="en">Self-Defense</span></span>
-        <span class="line-b"><span class="ja">逮捕術</span><span class="en">Arrest Arts</span></span>
-      </h1>
-      <p class="sd-hero-sub"><span class="ja">守破離の精神で、真の護身を。</span><span class="en">True self-defense through Shu-Ha-Ri.</span></p>
-    </div>
-    <div class="sd-hero-scroll">
-      <span></span>
-    </div>
-  </section>
+  <!-- ヒーロー -->
+  <HeroCarousel images={selfDefenseHeroBgs.slice(3)} alt="泰山流護身術" shuffle interval={6000}>
+    <p class="sd-eyebrow">Taizan-ryu</p>
+    <h1 class="sh-hero-title">
+      <span class="line-a"><span class="ja">護身術・逮捕術</span><span class="en">Self-Defense & Arrest Arts</span></span>
+    </h1>
+    <p class="sd-hero-sub">
+      <span class="ja">守破離の精神で、真の護身を。</span><span class="en">True self-defense through Shu-Ha-Ri.</span>
+    </p>
+  </HeroCarousel> 
 
   <!-- 説明セクション -->
   <section class="sd-desc surface-dark">
@@ -149,15 +127,17 @@ for (let i = 0; i < photos.length; i += COLS) {
         {martialArtsVideos.map((v) => (
           <div class="sd-video-item reveal">
             <div class="sd-video-wrap">
-              <iframe
-                src={getCloudflareStreamUrl(v.data.cloudflare_video_id, false, Number(v.data.thumbnail_time))}
-                title={v.data.title_jp}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen
-              ></iframe>
+              <video
+                src={getR2VideoUrl("videos", v.r2File!)}
+                poster={getR2PosterUrl("videos", v.r2File!)}
+                title={v.titleJP}
+                controls
+                preload="none"
+                playsinline
+              ></video>
             </div>
-            <p class="sd-video-caption ja">{v.data.title_jp} — {v.data.description_jp}</p>
-            <p class="sd-video-caption en">{v.data.title_en || v.data.title_jp} — {v.data.description_en || v.data.description_jp}</p>
+            <p class="sd-video-caption ja">{v.titleJP} — {v.descriptionJP}</p>
+            <p class="sd-video-caption en">{v.titleEN || v.titleJP} — {v.descriptionEN || v.descriptionJP}</p>
           </div>
         ))}
 
@@ -166,7 +146,7 @@ for (let i = 0; i < photos.length; i += COLS) {
   </section>
 
   <!-- 賞状セクション -->
-  <section class="certificates surface-dark">
+  <section class="cert-section surface-dark">
     <div class="sd-inner">
 
       <div class="sd-section-header reveal">
@@ -175,28 +155,55 @@ for (let i = 0; i < photos.length; i += COLS) {
         <p class="en">View the certificates honoring our founder's achievements.</p>
       </div>
 
-      <div class="sd-photo-grid cert-grid">
-        {certificates.map((cert, i) => {
-          const img = cert.data.image as unknown as { src?: string } | string;
-          const src = typeof img === "string" ? img : img?.src ?? "";
-          return (
-            <img
-              src={src}
-              alt={(cert.data.caption as unknown as string) ?? `賞状 ${i + 1}`}
-              loading="lazy"
-              class="cert-thumb"
-              data-src={src}
-            />
-          );
-        })}
+      <div class="cert-carousel reveal">
+        <div class="cert-main">
+          <button class="cert-arrow cert-arrow--prev" id="certPrev" aria-label="前の賞状">&#8249;</button>
+          <div class="cert-stage" id="certStage">
+            {selfDefenseCertificates.map((src, i) => (
+              <div class={`cert-slide${i === 0 ? ' cert-slide--active' : ''}`} data-index={i}>
+                <img
+                  src={src}
+                  alt={`賞状 ${i + 1}`}
+                  loading={i === 0 ? 'eager' : 'lazy'}
+                />
+                <div class="cert-zoom-hint">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                  </svg>
+                </div>
+              </div>
+            ))}
+          </div>
+          <button class="cert-arrow cert-arrow--next" id="certNext" aria-label="次の賞状">&#8250;</button>
+        </div>
+
+        <div class="cert-info">
+          <span class="cert-caption" id="certCaption">賞状 1</span>
+          <span class="cert-counter" id="certCounter">1 / {selfDefenseCertificates.length}</span>
+        </div>
+
+        <div class="cert-thumbs" id="certThumbs">
+          {selfDefenseCertificates.map((src, i) => (
+            <button
+              class={`cert-thumb-btn${i === 0 ? ' cert-thumb-btn--active' : ''}`}
+              data-index={i}
+              aria-label={`賞状 ${i + 1}`}
+            >
+              <img src={src} alt="" loading="lazy" />
+            </button>
+          ))}
+        </div>
       </div>
 
-      <!-- ライトボックス -->
-      <div class="lightbox" id="certLightbox" aria-hidden="true">
-        <button class="lightbox-close" id="certClose" aria-label="閉じる">&times;</button>
-        <img class="lightbox-img" id="certLightboxImg" src="" alt="" />
-      </div>
+    </div>
 
+    <!-- ライトボックス -->
+    <div class="cert-lb" id="certLb" aria-hidden="true">
+      <button class="cert-lb-close" id="certLbClose" aria-label="閉じる">&times;</button>
+      <button class="cert-lb-prev" id="certLbPrev" aria-label="前の賞状">&#8249;</button>
+      <button class="cert-lb-next" id="certLbNext" aria-label="次の賞状">&#8250;</button>
+      <img class="cert-lb-img" id="certLbImg" src="" alt="" />
+      <p class="cert-lb-counter" id="certLbCounter"></p>
     </div>
   </section>
 
@@ -205,38 +212,75 @@ for (let i = 0; i < photos.length; i += COLS) {
 </Base>
 
 <script>
-  const lightbox = document.getElementById("certLightbox") as HTMLElement;
-  const lightboxImg = document.getElementById("certLightboxImg") as HTMLImageElement;
-  const closeBtn = document.getElementById("certClose") as HTMLButtonElement;
+  const slides    = Array.from(document.querySelectorAll<HTMLElement>('.cert-slide'));
+  const thumbBtns = Array.from(document.querySelectorAll<HTMLButtonElement>('.cert-thumb-btn'));
+  const stage     = document.getElementById('certStage')!;
+  const prevBtn   = document.getElementById('certPrev')!;
+  const nextBtn   = document.getElementById('certNext')!;
+  const caption   = document.getElementById('certCaption')!;
+  const counter   = document.getElementById('certCounter')!;
+  const lb        = document.getElementById('certLb')!;
+  const lbImg     = document.getElementById('certLbImg') as HTMLImageElement;
+  const lbCounter = document.getElementById('certLbCounter')!;
+  const lbClose   = document.getElementById('certLbClose')!;
+  const lbPrev    = document.getElementById('certLbPrev')!;
+  const lbNext    = document.getElementById('certLbNext')!;
 
-  function openLightbox(src: string, alt: string) {
-    lightboxImg.src = src;
-    lightboxImg.alt = alt;
-    lightbox.classList.add("is-open");
-    lightbox.setAttribute("aria-hidden", "false");
-    document.body.style.overflow = "hidden";
+  let current = 0;
+  const total = slides.length;
+
+  function goTo(n: number) {
+    slides[current].classList.remove('cert-slide--active');
+    thumbBtns[current].classList.remove('cert-thumb-btn--active');
+    current = (n + total) % total;
+    slides[current].classList.add('cert-slide--active');
+    thumbBtns[current].classList.add('cert-thumb-btn--active');
+    caption.textContent = slides[current].querySelector('img')?.alt ?? '';
+    counter.textContent = `${current + 1} / ${total}`;
+    thumbBtns[current].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
   }
 
-  function closeLightbox() {
-    lightbox.classList.remove("is-open");
-    lightbox.setAttribute("aria-hidden", "true");
-    document.body.style.overflow = "";
+  prevBtn.addEventListener('click', () => goTo(current - 1));
+  nextBtn.addEventListener('click', () => goTo(current + 1));
+  thumbBtns.forEach((btn, i) => btn.addEventListener('click', () => goTo(i)));
+
+  function openLb(index: number) {
+    const img = slides[index].querySelector('img')!;
+    lbImg.src = img.src;
+    lbImg.alt = img.alt;
+    lbCounter.textContent = `${index + 1} / ${total}`;
+    lb.classList.add('cert-lb--open');
+    lb.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
   }
 
-  document.querySelectorAll<HTMLImageElement>(".cert-thumb").forEach((img) => {
-    img.addEventListener("click", () => {
-      openLightbox(img.dataset.src ?? img.src, img.alt);
-    });
-  });
+  function closeLb() {
+    lb.classList.remove('cert-lb--open');
+    lb.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
 
-  closeBtn.addEventListener("click", closeLightbox);
+  function lbGoTo(n: number) {
+    const idx = (n + total) % total;
+    goTo(idx);
+    openLb(idx);
+  }
 
-  lightbox.addEventListener("click", (e) => {
-    if (e.target === lightbox) closeLightbox();
-  });
+  stage.addEventListener('click', () => openLb(current));
+  lbClose.addEventListener('click', closeLb);
+  lbPrev.addEventListener('click', () => lbGoTo(current - 1));
+  lbNext.addEventListener('click', () => lbGoTo(current + 1));
+  lb.addEventListener('click', (e) => { if (e.target === lb) closeLb(); });
 
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && lightbox.classList.contains("is-open")) closeLightbox();
+  document.addEventListener('keydown', (e) => {
+    if (lb.classList.contains('cert-lb--open')) {
+      if (e.key === 'Escape')     closeLb();
+      if (e.key === 'ArrowLeft')  lbGoTo(current - 1);
+      if (e.key === 'ArrowRight') lbGoTo(current + 1);
+    } else {
+      if (e.key === 'ArrowLeft')  goTo(current - 1);
+      if (e.key === 'ArrowRight') goTo(current + 1);
+    }
   });
 </script>
 
@@ -246,116 +290,6 @@ for (let i = 0; i < photos.length; i += COLS) {
     max-width: 1100px;
     margin: 0 auto;
     padding: 0 40px;
-  }
-
-  /* ===== ヒーロー ===== */
-  .sd-hero {
-    position: relative;
-    width: 100%;
-    height: 100vh;
-    min-height: 600px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-  }
-
-  .sd-hero-bg {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-  }
-
-  .sd-hero-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-      to bottom,
-      rgba(0, 0, 0, 0.4) 0%,
-      rgba(107, 31, 35, 0.6) 100%
-    );
-  }
-
-  .sd-hero-content {
-    position: relative;
-    z-index: 2;
-    text-align: center;
-    color: #fff;
-    padding: 0 20px;
-  }
-
-  .sd-eyebrow {
-    font-size: 0.85rem;
-    letter-spacing: 5px;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.7);
-    margin-bottom: 24px;
-    opacity: 0;
-    animation: sdFadeUp 0.8s ease 0.2s forwards;
-  }
-
-  .sd-hero-title {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-bottom: 28px;
-  }
-
-  .line-a {
-    font-size: clamp(3rem, 8vw, 6rem);
-    font-weight: 600;
-    letter-spacing: 6px;
-    opacity: 0;
-    animation: sdFadeUp 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 0.4s forwards;
-  }
-
-  .line-b {
-    font-size: clamp(2rem, 5vw, 3.8rem);
-    font-weight: 300;
-    letter-spacing: 8px;
-    color: rgba(255, 255, 255, 0.85);
-    opacity: 0;
-    animation: sdFadeUp 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 0.6s forwards;
-  }
-
-  .sd-hero-sub {
-    font-size: 1rem;
-    letter-spacing: 3px;
-    color: rgba(255, 255, 255, 0.7);
-    opacity: 0;
-    animation: sdFadeUp 0.8s ease 0.9s forwards;
-  }
-
-  /* スクロールインジケーター */
-  .sd-hero-scroll {
-    position: absolute;
-    bottom: 40px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 2;
-  }
-
-  .sd-hero-scroll span {
-    display: block;
-    width: 1px;
-    height: 60px;
-    background: linear-gradient(to bottom, rgba(255,255,255,0.6), transparent);
-    margin: 0 auto;
-    animation: sdScrollLine 2s ease-in-out infinite;
-  }
-
-  @keyframes sdFadeUp {
-    to { opacity: 1; transform: translateY(0); }
-    from { opacity: 0; transform: translateY(24px); }
-  }
-
-  @keyframes sdScrollLine {
-    0%   { transform: scaleY(0); transform-origin: top; opacity: 1; }
-    50%  { transform: scaleY(1); transform-origin: top; opacity: 1; }
-    100% { transform: scaleY(1); transform-origin: top; opacity: 0; }
   }
 
   /* ===== 説明セクション ===== */
@@ -544,12 +478,14 @@ for (let i = 0; i < photos.length; i += COLS) {
     background-color: rgba(0, 0, 0, 0.3);
   }
 
-  .sd-video-wrap iframe {
+  .sd-video-wrap iframe,
+  .sd-video-wrap video {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     border: none;
+    object-fit: cover;
   }
 
   .sd-video-caption {
@@ -564,125 +500,258 @@ for (let i = 0; i < photos.length; i += COLS) {
     text-align: center;
   }
 
-  .sd-btn-outline {
-    display: inline-block;
-    padding: 14px 36px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 30px;
-    font-size: 0.9rem;
-    letter-spacing: 1px;
-    color: var(--text-primary);
-    transition: background-color 0.3s ease, border-color 0.3s ease;
-  }
-
-  .sd-btn-outline:hover {
-    background-color: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.6);
-  }
-
-  .sd-btn-primary {
-    display: inline-block;
-    padding: 16px 48px;
-    background-color: #fff;
-    color: #1a120d;
-    border-radius: 30px;
-    font-weight: 600;
-    font-size: 0.95rem;
-    letter-spacing: 1px;
-    transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
-  }
-
-  .sd-btn-primary:hover {
-    background-color: var(--bg-color-secondary);
-    transform: translateY(-3px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
-  }
-
-  /* ===== 賞状グリッド ===== */
-  .certificates {
+  /* ===== 賞状カルーセル ===== */
+  .cert-section {
     padding: 100px 0;
   }
 
-  .sd-photo-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 4px;
+  .cert-main {
+    display: flex;
+    align-items: center;
+    gap: 20px;
   }
 
-  .sd-photo-grid img {
-    width: 100%;
-    aspect-ratio: 1;
-    object-fit: cover;
-    filter: grayscale(20%);
-    transition: filter 0.4s ease, transform 0.4s ease;
-  }
-
-  .sd-photo-grid img:hover {
-    filter: grayscale(0%);
-    transform: scale(1.03);
+  .cert-stage {
+    flex: 1;
     position: relative;
-    z-index: 1;
+    height: 560px;
+    background-color: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: zoom-in;
   }
 
-  /* ===== ライトボックス ===== */
-  .lightbox {
-    position: fixed;
+  .cert-slide {
+    position: absolute;
     inset: 0;
-    z-index: 1000;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(0, 0, 0, 0.92);
+    padding: 28px;
     opacity: 0;
+    transition: opacity 0.45s ease;
     pointer-events: none;
-    transition: opacity 0.3s ease;
   }
 
-  .lightbox.is-open {
+  .cert-slide--active {
     opacity: 1;
     pointer-events: auto;
   }
 
-  .lightbox-img {
-    max-width: 90vw;
-    max-height: 88vh;
+  .cert-slide img {
+    max-width: 100%;
+    max-height: 100%;
     object-fit: contain;
-    border-radius: 4px;
-    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
-    transform: scale(0.92);
-    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    border-radius: 6px;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.55);
+    transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 
-  .lightbox.is-open .lightbox-img {
+  .cert-stage:hover .cert-slide--active img {
+    transform: scale(1.02);
+  }
+
+  .cert-zoom-hint {
+    position: absolute;
+    bottom: 18px;
+    right: 18px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.65);
+    opacity: 0;
+    transform: scale(0.75);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
+  }
+
+  .cert-stage:hover .cert-zoom-hint {
+    opacity: 1;
     transform: scale(1);
   }
 
-  .lightbox-close {
-    position: fixed;
-    top: 24px;
-    right: 32px;
+  /* 矢印ボタン */
+  .cert-arrow {
+    flex-shrink: 0;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    line-height: 1;
+  }
+
+  .cert-arrow:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.28);
+    color: #fff;
+  }
+
+  /* カウンター・キャプション */
+  .cert-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 2px 12px;
+  }
+
+  .cert-caption {
+    font-size: 0.83rem;
+    color: var(--text-secondary);
+    letter-spacing: 1.5px;
+  }
+
+  .cert-counter {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.3);
+    letter-spacing: 3px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* サムネイルストリップ */
+  .cert-thumbs {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+  }
+
+  .cert-thumbs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .cert-thumb-btn {
+    flex-shrink: 0;
+    width: 68px;
+    height: 68px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 2px solid transparent;
+    cursor: pointer;
     background: none;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 0;
+    opacity: 0.4;
+    transition: border-color 0.25s ease, opacity 0.25s ease;
+  }
+
+  .cert-thumb-btn img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .cert-thumb-btn--active {
+    border-color: rgba(255, 255, 255, 0.65);
+    opacity: 1;
+  }
+
+  .cert-thumb-btn:hover:not(.cert-thumb-btn--active) {
+    opacity: 0.7;
+  }
+
+  /* ===== ライトボックス (賞状) ===== */
+  .cert-lb {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(0, 0, 0, 0.96);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+  }
+
+  .cert-lb--open {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .cert-lb-img {
+    max-width: 90vw;
+    max-height: 88vh;
+    object-fit: contain;
+    border-radius: 6px;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.7);
+  }
+
+  .cert-lb-counter {
+    position: absolute;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.35);
+    letter-spacing: 3px;
+    margin: 0;
+  }
+
+  .cert-lb-close {
+    position: absolute;
+    top: 20px;
+    right: 24px;
+    background: none;
+    border: 1px solid rgba(255, 255, 255, 0.25);
     border-radius: 50%;
     width: 44px;
     height: 44px;
-    font-size: 1.5rem;
+    font-size: 1.6rem;
     line-height: 1;
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(255, 255, 255, 0.7);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background-color 0.2s ease, border-color 0.2s ease;
+    transition: background-color 0.2s, border-color 0.2s;
   }
 
-  .lightbox-close:hover {
-    background-color: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.7);
+  .cert-lb-close:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.6);
   }
 
-  .cert-thumb {
-    cursor: zoom-in;
+  .cert-lb-prev,
+  .cert-lb-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    color: #fff;
+    font-size: 2rem;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+  }
+
+  .cert-lb-prev { left: 20px; }
+  .cert-lb-next { right: 20px; }
+
+  .cert-lb-prev:hover,
+  .cert-lb-next:hover {
+    background: rgba(255, 255, 255, 0.16);
   }
 
   /* ===== レスポンシブ ===== */
@@ -720,5 +789,29 @@ for (let i = 0; i < photos.length; i += COLS) {
 
     .line-a { letter-spacing: 4px; }
     .line-b { letter-spacing: 5px; }
+
+    .cert-section {
+      padding: 60px 0;
+    }
+
+    .cert-stage {
+      height: 340px;
+    }
+
+    .cert-arrow {
+      width: 40px;
+      height: 40px;
+      font-size: 1.5rem;
+    }
+
+    .cert-thumb-btn {
+      width: 52px;
+      height: 52px;
+    }
+
+    .cert-lb-prev { left: 8px; }
+    .cert-lb-next { right: 8px; }
+    .cert-lb-prev,
+    .cert-lb-next { width: 40px; height: 40px; font-size: 1.4rem; }
   }
 </style>

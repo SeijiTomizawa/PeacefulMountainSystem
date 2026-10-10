@@ -1,10 +1,16 @@
 ---
 import Base from "../layouts/Base.astro";
-import images from "../components/blocks/images";
-
-const img = images as Record<string, string>;
-const oldPics      = Array.from({ length: 10 }, (_, i) => img[`sokeOldPic${i + 1}`]);
-const martialArts  = Array.from({ length: 22 }, (_, i) => img[`sokeMartialArt${i + 1}`]);
+import {
+  sokeImage,
+  sokeHeroImage,
+  sokeSokeCouple,
+  sokeShihanSaulCohe,
+  sokeSokeMichaelDePasquale,
+  sokeShodaiOkuyama,
+  martialartPhotos,
+  biographySokePhotos,
+  sokeMarketingPhotos,
+} from "../components/blocks/images";
 ---
 
 <Base
@@ -15,7 +21,7 @@ const martialArts  = Array.from({ length: 22 }, (_, i) => img[`sokeMartialArt${i
   <!-- ヒーローセクション -->
   <section class="sd-hero">
     <img
-      src={images.sokeSokeImage}
+      src={sokeHeroImage}
       alt="宗家ジョセフ・ミラー"
       class="sd-hero-bg"
     />
@@ -55,7 +61,7 @@ const martialArts  = Array.from({ length: 22 }, (_, i) => img[`sokeMartialArt${i
           <span class="sd-pillar-num">01</span>
           <div class="sd-pillar-body">
             <img
-              src={images.sokeShihanSaulCohe}
+              src={sokeShihanSaulCohe}
               alt="宗家 ジョセフ・ミラー"
               class="soke-photo"
             />
@@ -68,7 +74,7 @@ const martialArts  = Array.from({ length: 22 }, (_, i) => img[`sokeMartialArt${i
           <span class="sd-pillar-num">02</span>
           <div class="sd-pillar-body">
             <img
-              src={images.sokeSokeMichaelDePasquale}
+              src={sokeSokeMichaelDePasquale}
               alt="宗家 ジョセフ・ミラー"
               class="soke-photo"
             />
@@ -82,7 +88,7 @@ const martialArts  = Array.from({ length: 22 }, (_, i) => img[`sokeMartialArt${i
           <span class="sd-pillar-num">03</span>
           <div class="sd-pillar-body">
             <img
-              src={images.sokeShodaiOkuyama}
+              src={sokeShodaiOkuyama}
               alt="宗家 ジョセフ・ミラー"
               class="soke-photo"
             />
@@ -127,7 +133,7 @@ const martialArts  = Array.from({ length: 22 }, (_, i) => img[`sokeMartialArt${i
 
         <div class="sd-quote-image">
           <img
-            src={ images.sokeSokeCouple }
+            src={ sokeSokeCouple }
             alt="奥様との写真"
           />
           <p class="sd-quote-caption"><span class="ja">日本での思い出</span><span class="en">Memories from Japan</span></p>
@@ -168,6 +174,20 @@ const martialArts  = Array.from({ length: 22 }, (_, i) => img[`sokeMartialArt${i
           It is now 2023, and there is a void in my heart — the place filled by Soke Michael Sr., 2nd Soke Michael Jr., Mrs. DePasquale, and the DePasquale family. With God's help, I will continue to teach the Yoshitsune system in honor of the DePasquale legacy, as well as my own Taizan-ryu system, until God calls me home.
         </p>
       </blockquote>
+      <!-- 宗家の宣材写真 -->
+      <div class="sd-quote-image sd-marketing">
+        <p class="sd-quote-caption"><span class="ja">宗家 ジョセフ・ミラー</span><span class="en">Soke Joseph Miller</span></p>
+        <div class="sd-marketing-grid">
+          {sokeMarketingPhotos.map((photo, i) => (
+            <img
+              src={photo}
+              alt={`宗家の宣材写真 ${i + 1}`}
+              style={`animation-delay: ${(i % 4) * 80}ms`}
+              loading="lazy"
+            />
+          ))}
+        </div>
+      </div>
     </div>
   </section>
 
@@ -182,8 +202,13 @@ const martialArts  = Array.from({ length: 22 }, (_, i) => img[`sokeMartialArt${i
       </div>
 
       <div class="sd-photo-grid">
-        {oldPics.map((src, i) => (
-          <img src={src} alt={`宗家 写真 ${i + 1}`} loading="lazy" />
+        {biographySokePhotos.slice(2).map((photo, i) => (
+          <img
+            src={photo}
+            alt={`宗家の若い頃の写真 ${i + 1}`}
+            style={`animation-delay: ${(i % 4) * 80}ms`}
+            loading="lazy"
+          />
         ))}
       </div>
     </div>
@@ -220,8 +245,8 @@ const martialArts  = Array.from({ length: 22 }, (_, i) => img[`sokeMartialArt${i
       </div>
 
       <div class="sd-photo-grid">
-        {martialArts.map((src, i) => (
-          <img src={src} alt={`武道 写真 ${i + 1}`} loading="lazy" />
+        {martialartPhotos.map((src, i) => (
+          <img src={src} alt={`宗家の仲間たちの写真 ${i + 1}`} loading="lazy" />
         ))}
       </div>
     </div>
@@ -245,8 +270,9 @@ const martialArts  = Array.from({ length: 22 }, (_, i) => img[`sokeMartialArt${i
     height: 100vh;
     min-height: 600px;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-end;
     overflow: hidden;
   }
 
@@ -277,7 +303,8 @@ const martialArts  = Array.from({ length: 22 }, (_, i) => img[`sokeMartialArt${i
     z-index: 2;
     text-align: center;
     color: #fff;
-    padding: 0 20px;
+    padding: 0 20px 90px;
+    width: 100%;
   }
 
   .sd-eyebrow {
@@ -293,8 +320,28 @@ const martialArts  = Array.from({ length: 22 }, (_, i) => img[`sokeMartialArt${i
   .sd-hero-title {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    align-items: center;
+    gap: 12px;
     margin-bottom: 28px;
+    font-size: clamp(3.5rem, 9vw, 7rem);
+    font-weight: 400;
+    letter-spacing: 8px;
+    line-height: 1.15;
+    text-shadow: 0 2px 40px rgba(0,0,0,0.8);
+    opacity: 0;
+    animation: sdFadeUp 1.1s cubic-bezier(0.2, 0.8, 0.2, 1) 0.8s forwards;
+  }
+
+  [data-lang="ja"] .sd-hero-title .ja {
+    font-family: 'Yuji Syuku', serif;
+  }
+
+  .sd-hero-title .line-2,
+  .sd-hero-title .line-2 .ja,
+  .sd-hero-title .line-2 .en {
+    font-size: clamp(1.4rem, 5.5vw, 3.5rem);
+    letter-spacing: clamp(1px, 1.2vw, 8px);
+    white-space: nowrap;
   }
 
   .line-a {
@@ -472,6 +519,25 @@ const martialArts  = Array.from({ length: 22 }, (_, i) => img[`sokeMartialArt${i
     filter: grayscale(10%);
   }
 
+  /* 宣材写真：スマホ・PC共通で横3枚 */
+  .sd-marketing {
+    max-width: 960px;
+  }
+
+  .sd-marketing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(6px, 2vw, 20px);
+    margin-top: 20px;
+  }
+
+  .sd-marketing-grid img {
+    max-width: none;
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+  }
+
   .sd-quote-caption {
     margin-top: 10px;
     font-size: 0.78rem;
@@ -554,40 +620,6 @@ const martialArts  = Array.from({ length: 22 }, (_, i) => img[`sokeMartialArt${i
 
   .sd-yt-link {
     text-align: center;
-  }
-
-  .sd-btn-outline {
-    display: inline-block;
-    padding: 14px 36px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 30px;
-    font-size: 0.9rem;
-    letter-spacing: 1px;
-    color: var(--text-primary);
-    transition: background-color 0.3s ease, border-color 0.3s ease;
-  }
-
-  .sd-btn-outline:hover {
-    background-color: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.6);
-  }
-
-  .sd-btn-primary {
-    display: inline-block;
-    padding: 16px 48px;
-    background-color: #fff;
-    color: #1a120d;
-    border-radius: 30px;
-    font-weight: 600;
-    font-size: 0.95rem;
-    letter-spacing: 1px;
-    transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
-  }
-
-  .sd-btn-primary:hover {
-    background-color: var(--bg-color-secondary);
-    transform: translateY(-3px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
   }
 
   /* ===== 信仰セクション ===== */

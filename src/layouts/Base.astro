@@ -1,8 +1,6 @@
 ---
-import { getMenu, getSiteSettings } from "emdash";
-import { EmDashHead } from "emdash/ui";
-import { createPublicPageContext } from "emdash/page";
-import { logoImage } from "../components/blocks/images";
+import { logoImage, taizanLogo } from "../components/blocks/images";
+import "../styles/global.css";
 
 interface Props {
   title?: string;
@@ -12,24 +10,10 @@ interface Props {
 }
 
 const { title, description, image = logoImage, noindex = false } = Astro.props;
-const settings = await getSiteSettings();
-const siteTitle = settings?.title || "泰山流護身術・逮捕術";
+const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
+const siteTitle = "泰山流護身術・逮捕術";
 const fullTitle = title ? `${title} — ${siteTitle}` : siteTitle;
-const siteDescription = settings?.tagline || "東京八王子本部道場";
-
-const menu = await getMenu("primary");
-
-const pageCtx = createPublicPageContext({
-  Astro,
-  kind: "custom",
-  pageType: "website",
-  title: fullTitle,
-  description: description || siteDescription,
-  canonical: Astro.url.href,
-  image,
-  seo: { ogImage: image },
-  siteName: siteTitle,
-});
+const siteDescription = description || "東京八王子本部道場";
 ---
 <!DOCTYPE html>
 <html lang="ja" data-lang="ja">
@@ -37,11 +21,20 @@ const pageCtx = createPublicPageContext({
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{fullTitle}</title>
-    <EmDashHead page={pageCtx} />
+    <meta name="description" content={siteDescription} />
+    <link rel="canonical" href={Astro.url.href} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={siteDescription} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={Astro.url.href} />
+    <meta property="og:image" content={image} />
+    <meta property="og:site_name" content={siteTitle} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={siteDescription} />
+    <meta name="twitter:image" content={image} />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
-    <!-- hreflang -->
-    <link rel="alternate" hreflang="ja" href={Astro.url.href} />
-    <link rel="alternate" hreflang="en" href={Astro.url.href} />
+    <!-- hreflang: 単一URLで言語切り替えのため x-default のみ -->
     <link rel="alternate" hreflang="x-default" href={Astro.url.href} />
     <!-- Favicon -->
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -110,6 +103,7 @@ const pageCtx = createPublicPageContext({
         <ul>
           <li><a href="/#home"><span class="ja">ホーム</span><span class="en">Home</span></a></li>
           <li><a href="/self-defense"><span class="ja">護身術・逮捕術</span><span class="en">Martial Arts</span></a></li>
+          <li><a href="/yoshitsune-ryu"><span class="ja">義経流柔術</span><span class="en">Yoshitsune-ryu Jujutsu</span></a></li>
           <li><a href="/shiatsu"><span class="ja">指圧治療院</span><span class="en">Shiatsu Clinic</span></a></li>
           <li><a href="/testimonials"><span class="ja">治療院お客様の声</span><span class="en">Testimonials</span></a></li>
           <li><a href="/soke"><span class="ja">宗家について</span><span class="en">About the Soke</span></a></li>
@@ -123,6 +117,41 @@ const pageCtx = createPublicPageContext({
 
     <div class="overlay" id="overlay"></div>
 
+    <nav class="sidebar-nav" aria-label="メインナビゲーション">
+      <ul>
+        <li class={currentPath === '/' ? 'active' : ''}>
+          <a href="/#home"><span class="ja">ホーム</span><span class="en">Home</span></a>
+        </li>
+        <li class={currentPath === '/self-defense' ? 'active' : ''}>
+          <a href="/self-defense"><span class="ja">護身術・逮捕術</span><span class="en">Martial Arts</span></a>
+        </li>
+        <li class={currentPath === '/yoshitsune-ryu' ? 'active' : ''}>
+          <a href="/yoshitsune-ryu"><span class="ja">義経流柔術</span><span class="en">Yoshitsune-ryu Jujutsu</span></a>
+        </li>
+        <li class={currentPath === '/shiatsu' ? 'active' : ''}>
+          <a href="/shiatsu"><span class="ja">指圧治療院</span><span class="en">Shiatsu Clinic</span></a>
+        </li>
+        <li class={currentPath === '/testimonials' ? 'active' : ''}>
+          <a href="/testimonials"><span class="ja">治療院お客様の声</span><span class="en">Testimonials</span></a>
+        </li>
+        <li class={currentPath === '/soke' ? 'active' : ''}>
+          <a href="/soke"><span class="ja">宗家について</span><span class="en">About the Soke</span></a>
+        </li>
+        <li class={currentPath === '/event-photos' ? 'active' : ''}>
+          <a href="/event-photos"><span class="ja">大会写真</span><span class="en">Event Photos</span></a>
+        </li>
+        <li class={currentPath === '/members' ? 'active' : ''}>
+          <a href="/members"><span class="ja">門下生たち</span><span class="en">Members</span></a>
+        </li>
+        <li class={currentPath === '/affiliated-dojos' ? 'active' : ''}>
+          <a href="/affiliated-dojos"><span class="ja">友好関係の道場</span><span class="en">Affiliated Dojos</span></a>
+        </li>
+        <li class={currentPath === '/contact' ? 'active' : ''}>
+          <a href="/contact"><span class="ja">お問い合わせ</span><span class="en">Contact Us</span></a>
+        </li>
+      </ul>
+    </nav>
+
     <main>
       <slot />
     </main>
@@ -131,26 +160,21 @@ const pageCtx = createPublicPageContext({
       <div class="global-cta-inner reveal">
         <h2><span class="ja">仲間になりませんか</span><span class="en">Join Our Family</span></h2>
         <p><span class="ja">経験・国籍・年齢は問いません。まずは見学・体験稽古からお気軽にどうぞ。</span><span class="en">Experience, nationality, and age are no barrier. Feel free to come watch or try a training session.</span></p>
-        <a href="/contact" class="global-cta-btn"><span class="ja">お問い合わせ</span><span class="en">Contact Us</span></a>
+        <a href="/contact" class="btn-primary"><span class="ja">お問い合わせ</span><span class="en">Contact Us</span></a>
       </div>
     </section>
 
     <footer class="site-footer">
       <div class="footer-content">
+        <a href="/" class="footer-logo">
+          <img src={taizanLogo} alt={siteTitle} class="footer-logo-img" />
+        </a>
         <p>&copy; {new Date().getFullYear()} {siteTitle}. All Rights Reserved.</p>
         <div class="social-links">
-          <a href="https://www.facebook.com/taizanryu" target="_blank" rel="noopener">Facebook</a>
+          <a href="https://www.facebook.com/share/17vx8dscbg/" target="_blank" rel="noopener">Facebook</a>
           <a href="https://www.instagram.com/taizanryu" target="_blank" rel="noopener">Instagram</a>
           <a href="https://www.youtube.com/@taizanryu" target="_blank" rel="noopener">YouTube</a>
         </div>
-      </div>
-      <div class="footer-admin">
-        <a href="/_emdash/admin" class="admin-link" aria-label="Admin">
-          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-          </svg>
-        </a>
       </div>
     </footer>
 
@@ -226,249 +250,5 @@ const pageCtx = createPublicPageContext({
       });
     </script>
 
-    <style is:global>
-      :root {
-        --bg-color: #6B1F23;
-        --bg-color-secondary: #E8E2D6;
-        --bg-black: #0d0806;
-        --text-primary: #ffffff;
-        --text-secondary: #bbaea6;
-        --text-on-light: #1a120d;
-        --text-on-light-muted: #5c4a3c;
-        --font-sans: 'Montserrat', sans-serif;
-        --header-height: 80px;
-      }
-
-      * { margin: 0; padding: 0; box-sizing: border-box; }
-      html { scroll-behavior: smooth; }
-      body {
-        background-color: var(--bg-color);
-        color: var(--text-primary);
-        font-family: var(--font-sans);
-        line-height: 1.6;
-        overflow-x: hidden;
-      }
-      a { color: inherit; text-decoration: none; }
-
-      /* ===== 背景色・文字色ペア ===== */
-      .surface-dark  { background-color: var(--bg-color);  color: var(--text-primary); }
-      .surface-black { background-color: var(--bg-black);  color: var(--text-primary); }
-      .surface-light {
-        background-color: var(--bg-color-secondary);
-        color: var(--text-on-light);
-        --text-primary: var(--text-on-light);
-        --text-secondary: var(--text-on-light-muted);
-      }
-      .surface-white {
-        background-color: #ffffff;
-        color: var(--text-on-light);
-        --text-primary: var(--text-on-light);
-        --text-secondary: var(--text-on-light-muted);
-      }
-
-      /* 毛筆フォント：日本語見出し全体に適用 */
-      h1 .ja, h2 .ja, h3 .ja {
-        font-family: 'Yuji Syuku', serif;
-        font-weight: 400;
-      }
-
-      /* --- Language toggle --- */
-      .en { display: none; }
-      [data-lang="en"] .en { display: revert; }
-      [data-lang="en"] .ja { display: none; }
-
-      /* --- Header --- */
-      .site-header {
-        position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height);
-        background-color: var(--bg-color); backdrop-filter: blur(5px);
-        display: flex; justify-content: space-between; align-items: center;
-        padding: 0 40px; z-index: 100;
-      }
-      .header-left { display: flex; align-items: center; gap: 15px; min-width: 0; overflow: hidden; }
-      .header-right { display: flex; align-items: center; gap: 16px; flex-shrink: 0; }
-      .logo-box img { width: 56px; height: 56px; border-radius: 4px; }
-      .site-title-block { display: flex; flex-direction: column; gap: 3px; min-width: 0; overflow: hidden; }
-      .l-1 { font-size: clamp(0.6rem, 2.5vw, 0.85rem); font-weight: 600; letter-spacing: clamp(0px, 0.15vw, 1.5px); white-space: nowrap; overflow: hidden; }
-      .l-2 { font-size: clamp(0.5rem, 1.8vw, 0.65rem); font-weight: 400; letter-spacing: clamp(0px, 0.1vw, 1px); color: var(--text-secondary); white-space: nowrap; overflow: hidden; }
-
-      /* --- Language button (header) --- */
-      .lang-btn {
-        background: rgba(255,255,255,0.08);
-        border: 1px solid rgba(255,255,255,0.35);
-        color: #fff;
-        font-family: var(--font-sans);
-        font-size: 0.72rem;
-        font-weight: 600;
-        letter-spacing: 2.5px;
-        padding: 8px 16px;
-        cursor: pointer;
-        border-radius: 20px;
-        transition: background 0.25s ease, border-color 0.25s ease, transform 0.15s ease;
-        white-space: nowrap;
-        min-height: 36px;
-        display: inline-flex;
-        align-items: center;
-        gap: 0;
-      }
-      /* header btn: only show the span for the target language */
-      .lang-btn .lang-ja,
-      .lang-btn .lang-en { display: inline; }
-      [data-lang="ja"] .lang-btn .lang-ja { display: inline; }
-      [data-lang="ja"] .lang-btn .lang-en { display: none; }
-      [data-lang="en"] .lang-btn .lang-en { display: inline; }
-      [data-lang="en"] .lang-btn .lang-ja { display: none; }
-      .lang-btn:hover {
-        background: rgba(255,255,255,0.18);
-        border-color: rgba(255,255,255,0.7);
-        transform: translateY(-1px);
-      }
-      .lang-btn:active { transform: translateY(0); }
-
-      /* --- Language button (drawer) --- */
-      .drawer-lang {
-        margin-bottom: 24px;
-      }
-      .lang-btn--drawer {
-        width: 100%;
-        border-radius: 10px;
-        padding: 14px 20px;
-        background: rgba(255,255,255,0.05);
-        border: 1px solid rgba(255,255,255,0.15);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 12px;
-        min-height: 60px;
-      }
-      .lang-btn--drawer:hover {
-        background: rgba(255,255,255,0.1);
-        border-color: rgba(255,255,255,0.35);
-        transform: none;
-      }
-      .drawer-lang-ja,
-      .drawer-lang-en {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 3px;
-        transition: color 0.25s ease, opacity 0.25s ease;
-        opacity: 0.4;
-      }
-      .drawer-lang-ja[data-active="true"],
-      .drawer-lang-en[data-active="true"] {
-        opacity: 1;
-        color: #fff;
-      }
-      .drawer-lang-label {
-        font-size: 0.9rem;
-        font-weight: 600;
-        letter-spacing: 1px;
-        display: block;
-      }
-      .drawer-lang-sub {
-        font-size: 0.65rem;
-        letter-spacing: 1.5px;
-        font-weight: 400;
-        color: inherit;
-        display: block;
-        opacity: 0.7;
-      }
-      .drawer-lang-divider {
-        font-size: 1.1rem;
-        color: rgba(255,255,255,0.25);
-        font-weight: 300;
-      }
-
-      /* --- Hamburger --- */
-      .hamburger { background: none; border: none; cursor: pointer; display: flex; flex-direction: column; gap: 6px; padding: 10px; z-index: 101; }
-      .hamburger .bar { display: block; width: 30px; height: 2px; background-color: var(--text-primary); transition: 0.3s ease; }
-
-      /* --- Drawer --- */
-      .drawer-menu {
-        position: fixed; top: 0; right: -100%; width: 350px; height: 100vh;
-        background-color: var(--bg-color); z-index: 200; padding: 80px 40px 60px;
-        transition: right 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); box-shadow: -5px 0 15px rgba(0,0,0,0.5);
-        overflow-y: auto;
-      }
-      .drawer-menu.open { right: 0; }
-      .close-btn { position: absolute; top: 25px; right: 40px; background: none; border: none; color: var(--text-primary); font-size: 2.5rem; cursor: pointer; line-height: 1; }
-      .drawer-nav ul { list-style: none; display: flex; flex-direction: column; gap: 0; margin-top: 40px; }
-      .drawer-nav li { border-bottom: 1px solid rgba(255,255,255,0.07); }
-      .drawer-nav a {
-        display: block; padding: 16px 0;
-        font-size: 1.1rem; font-weight: 300; letter-spacing: 2px;
-        transition: color 0.3s ease, padding-left 0.3s ease;
-      }
-      .drawer-nav a:hover { color: var(--text-secondary); padding-left: 8px; }
-
-      /* --- Overlay --- */
-      .overlay {
-        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-        background-color: rgba(0, 0, 0, 0.6); z-index: 150; opacity: 0; visibility: hidden;
-        transition: opacity 0.4s ease, visibility 0.4s ease;
-      }
-      .overlay.open { opacity: 1; visibility: visible; }
-
-      /* --- Footer --- */
-      .site-footer { background-color: var(--bg-color); padding: 48px 40px 32px; border-top: 1px solid rgba(255,255,255,0.1); }
-      .footer-content { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--text-secondary); }
-      .footer-admin { display: none; }
-      .admin-link {
-        display: inline-flex; align-items: center; justify-content: center;
-        width: 24px; height: 24px;
-        color: rgba(255,255,255,0.15);
-        transition: color 0.3s ease;
-      }
-      .admin-link:hover { color: rgba(255,255,255,0.5); }
-      .social-links { display: flex; gap: 0; }
-      .social-links a { padding: 4px 16px; border-left: 1px solid rgba(255,255,255,0.15); transition: color 0.3s ease; }
-      .social-links a:first-child { border-left: none; padding-left: 0; }
-      .social-links a:hover { color: var(--text-primary); }
-
-      /* --- Global Layout & Animations --- */
-      .container {
-        max-width: 1200px; margin: 0 auto;
-        padding: calc(100px + var(--header-height)) 40px 100px;
-        display: flex; flex-direction: column;
-      }
-
-      .fade-in-title span { display: inline-block; opacity: 0; transform: translateY(20px); animation: titleFadeIn 0.8s ease forwards; }
-      .fade-in-title .line-1 { animation-delay: 0.2s; }
-      .fade-in-title .line-2 { animation-delay: 0.5s; }
-      @keyframes titleFadeIn { to { opacity: 1; transform: translateY(0); } }
-
-      .hero-fade { opacity: 0; animation: heroImageFade 1s ease forwards; }
-      .hero-img-1 { animation-delay: 0.8s; }
-      .hero-img-2 { animation-delay: 1.1s; }
-      .hero-img-3 { animation-delay: 1.4s; }
-      .author-name { animation-delay: 1.7s; }
-      @keyframes heroImageFade { from { opacity: 0; } to { opacity: 1; } }
-
-      .reveal { opacity: 0; transform: translateY(50px); transition: opacity 1.2s cubic-bezier(0.2, 0.8, 0.2, 1), transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1); }
-      .reveal.active { opacity: 1; transform: translateY(0); }
-
-      /* --- Global CTA --- */
-      .global-cta { padding: 100px 40px; background-color: var(--bg-color); text-align: center; }
-      .global-cta-inner { max-width: 640px; margin: 0 auto; }
-      .global-cta h2 { font-size: clamp(1.8rem, 3vw, 2.4rem); font-weight: 400; letter-spacing: 4px; margin-bottom: 20px; }
-      .global-cta p { font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 40px; line-height: 1.8; }
-      .global-cta-btn {
-        display: inline-block; padding: 16px 48px;
-        background-color: #fff; color: #1a120d;
-        border-radius: 30px; font-weight: 600; font-size: 0.95rem; letter-spacing: 1px;
-        transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
-      }
-      .global-cta-btn:hover {
-        background-color: var(--bg-color-secondary);
-        transform: translateY(-3px);
-        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
-      }
-
-      @media (max-width: 900px) {
-        .site-header { padding: 0 20px; }
-        .drawer-menu { width: 80%; }
-        .footer-content { flex-direction: column; gap: 15px; text-align: center; }
-      }
-    </style>
   </body>
 </html>

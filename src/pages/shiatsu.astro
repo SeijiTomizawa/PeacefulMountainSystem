@@ -1,14 +1,13 @@
 ---
 import Base from "../layouts/Base.astro";
-import { getEmDashCollection } from "emdash";
-import { getCloudflareStreamUrl } from "../components/blocks/videos";
-import images from "../components/blocks/images";
+import {
+  shiatsuImages,
+  shiatsuCertificates,
+  shiatsuTextbook1,
+  shiatsuTestimonialsImage,
+} from "../components/blocks/images";
 
-const { entries: allVideos, cacheHint } = await getEmDashCollection("videos", { limit: 100 });
-try { Astro.cache.set(cacheHint); } catch {}
-
-const dojoVideos = allVideos.filter(v => v.data.category === "dojo-training").slice(0, 4);
-const testimonialVideos = allVideos.filter(v => v.data.category === "shiatsu-testimonial");
+import HeroCarousel from "../components/HeroCarousel.astro";
 ---
 
 <Base
@@ -16,26 +15,18 @@ const testimonialVideos = allVideos.filter(v => v.data.category === "shiatsu-tes
   description="泰山流指圧整体院 — 武道の知識と経験を活かした独自の指圧療法。身体のバランスを整え、自然治癒力を高める東京八王子の治療院。"
 >
 
-  <!-- ヒーローセクション -->
-  <section class="sh-hero">
-    <img
-      src="https://pub-488a24026ed4411b8d591260b603cdd1.r2.dev/shiatsu/SHIATSU_DO_02.webp"
-      alt="泰山流指圧整体院"
-      class="sh-hero-bg"
-    />
-    <div class="sh-hero-overlay"></div>
-    <div class="sh-hero-content">
-      <p class="sh-eyebrow">Taizan-ryu</p>
-      <h1 class="sh-hero-title">
-        <span class="line-a"><span class="ja">指圧</span><span class="en">Shiatsu</span></span>
-        <span class="line-b"><span class="ja">整体院</span><span class="en">Clinic</span></span>
-      </h1>
-      <p class="sh-hero-sub"><span class="ja">武道の知で、身体を癒す。</span><span class="en">Healing the body through martial wisdom.</span></p>
-    </div>
-    <div class="sh-hero-scroll">
-      <span></span>
-    </div>
-  </section>
+  <!-- ヒーロー -->
+  <HeroCarousel images={shiatsuImages} alt="泰山流指圧整体院" shuffle interval={6000}>
+    <p class="sh-eyebrow">Taizan-ryu</p>
+    <h1 class="sh-hero-title">
+      <span class="line-a"><span class="ja">指圧</span><span class="en">Shiatsu</span></span>
+      <span class="line-b"><span class="ja">整体院</span><span class="en">Clinic</span></span>
+    </h1>
+    <h2>
+      <span class="ja">武道の知で、身体を癒す。</span>
+      <span class="en">Healing the body through martial wisdom.</span>
+    </h2>
+  </HeroCarousel>
 
   <!-- 説明セクション -->
   <section class="sh-desc surface-dark">
@@ -57,35 +48,232 @@ const testimonialVideos = allVideos.filter(v => v.data.category === "shiatsu-tes
           profound knowledge of meridians and pressure points to restore balance and unlock natural healing.
         </p>
       </div>
+    </div>
+  </section>
 
-      <div class="sh-pillars">
 
-        <div class="sh-pillar reveal">
-          <span class="sh-pillar-num">01</span>
-          <div class="sh-pillar-body">
-            <h3><span class="ja">皇法指圧との融合</span><span class="en">Fusion with Koho Shiatsu</span></h3>
-            <p class="ja">八光流柔術に組み込まれた皇法指圧を源流に持ちます。伝統的な手技の本質を受け継ぎながら、より効果的な施術を追求しました。</p>
-            <p class="en">Rooted in Koho Shiatsu incorporated into Hakko-ryu Ju-jutsu. While inheriting the essence of traditional hand techniques, we pursued more effective treatment methods.</p>
+  <!-- 経絡についてセクション -->
+  <section class="sh-meridians surface-light" id="meridians">
+    <div class="sh-inner">
+
+      <div class="sh-section-header reveal">
+        <h2><span class="ja">経絡について</span><span class="en">About Meridians</span></h2>
+        <p class="ja">見出しをクリックすると詳細が開きます。</p>
+        <p class="en">Click a heading to expand its details.</p>
+      </div>
+
+      <div class="sh-meridian-list reveal">
+
+        <!-- 1. 五行と経絡 -->
+        <details class="sh-meridian-item">
+          <summary class="sh-meridian-head">
+            <span class="sh-meridian-head-text">
+              <span class="ja">五行と経絡</span>
+              <span class="en">The Five Elements and the Meridians</span>
+            </span>
+            <span class="sh-meridian-icon" aria-hidden="true"></span>
+          </summary>
+          <div class="sh-meridian-body">
+            <p class="ja">中医学では、十二経絡は五行（木・火・土・金・水）の理論と密接に結びついています。五臓それぞれがひとつの元素に対応し、気の流れが健康・感情・心身のバランスにどう影響するかを説明します。</p>
+            <p class="en">In Traditional Chinese Medicine, the twelve principal meridians are closely tied to the theory of the Five Elements — Wood, Fire, Earth, Metal, and Water. Each of the five primary Yin organs is associated with one element, describing how Qi flows through the body and shapes health, emotion, and balance.</p>
+            <ul>
+              <li><span class="ja">肝経 — 木（成長・計画・怒り／春）</span><span class="en">Liver Meridian — Wood element (growth, planning, anger; the season of spring)</span></li>
+              <li><span class="ja">心経 — 火（温かさ・喜び・循環／夏）</span><span class="en">Heart Meridian — Fire element (warmth, joy, circulation; the season of summer)</span></li>
+              <li><span class="ja">脾経 — 土（栄養・安定・思い煩い／晩夏）</span><span class="en">Spleen Meridian — Earth element (nourishment, stability, worry; late summer)</span></li>
+              <li><span class="ja">肺経 — 金（構造・浄化・悲しみ／秋）</span><span class="en">Lung Meridian — Metal element (structure, purification, grief; the season of autumn)</span></li>
+              <li><span class="ja">腎経 — 水（精の貯蔵・恐れ・意志力／冬）</span><span class="en">Kidney Meridian — Water element (stored essence, fear, willpower; the season of winter)</span></li>
+            </ul>
+            <p class="ja">これら五つの元素は「相生」「相剋」という循環の中で互いに作用し合い、バランスが保たれることで心身の調和が生まれます。</p>
+            <p class="en">These five elements interact in generating and controlling cycles, and when they remain in balance, the body and mind stay in harmony.</p>
           </div>
-        </div>
+        </details>
 
-        <div class="sh-pillar reveal">
-          <span class="sh-pillar-num">02</span>
-          <div class="sh-pillar-body">
-            <h3><span class="ja">泰山流独自の手技</span><span class="en">Taizan-ryu Original Technique</span></h3>
-            <p class="ja">母指先端ではなく母指付け根全体を使う独自のストローク技術。多くのクライアントから「痛みが少なく、深く効く」と好評を得ています。</p>
-            <p class="en">A unique stroking technique using the full base of the thumb rather than its tip. Praised by many clients as "less painful and deeply effective."</p>
-          </div>
-        </div>
+        <!-- 2. 腕の経絡 -->
+        <details class="sh-meridian-item">
+          <summary class="sh-meridian-head">
+            <span class="sh-meridian-head-text">
+              <span class="ja">腕の経絡と身体の構造</span>
+              <span class="en">Arm Meridians and Anatomical Correspondences</span>
+            </span>
+            <span class="sh-meridian-icon" aria-hidden="true"></span>
+          </summary>
+          <div class="sh-meridian-body">
+            <p class="ja">腕を走る六つの経絡は、陽経（外側）と陰経（内側）のペアに分けられます。一部の解釈では、その経路を前腕・手の主要な動脈や神経に重ねて説明することがあります。脈診や感覚・運動への影響を理解する手がかりにはなりますが、経絡は本来、解剖学的構造そのものではなく「気」の通り道として捉えられてきたものです。</p>
+            <p class="en">The six meridians running through the arm are divided into Yang (outer) and Yin (inner) pairs. Some interpretive texts describe their pathways as loosely overlapping major arteries and nerves of the forearm and hand — useful for pulse palpation and understanding sensory or motor effects, though TCM meridians are traditionally understood as energetic pathways rather than direct anatomical structures.</p>
 
-        <div class="sh-pillar reveal">
-          <span class="sh-pillar-num">03</span>
-          <div class="sh-pillar-body">
-            <h3><span class="ja">統合的な治療アプローチ</span><span class="en">Integrated Treatment Approach</span></h3>
-            <p class="ja">皇法・泰山流・浪越指圧の各システムを症状に応じて使い分け。武道で鍛えた身体感覚が、的確なアプローチを可能にします。</p>
-            <p class="en">Applying Koho, Taizan-ryu, and Namikoshi Shiatsu systems according to the condition. The body awareness developed through martial arts enables precise application.</p>
+            <p class="sh-meridian-subhead ja">陽経（外側の経路）</p>
+            <p class="sh-meridian-subhead en">Yang Meridians (outer pathway)</p>
+            <ul>
+              <li><span class="ja">大腸経 — 橈側（親指側）を走行／橈骨動脈に対応</span><span class="en">Large Intestine Meridian — runs along the radial (thumb) side; associated with the radial artery</span></li>
+              <li><span class="ja">三焦経 — 腕の中央を走行／正中動脈に対応</span><span class="en">Triple Heater (San Jiao) Meridian — runs along the center of the arm; associated with the median artery</span></li>
+              <li><span class="ja">小腸経 — 尺側（小指側）を走行／尺骨動脈に対応</span><span class="en">Small Intestine Meridian — runs along the ulnar (little-finger) side; associated with the ulnar artery</span></li>
+            </ul>
+
+            <p class="sh-meridian-subhead ja">陰経（内側の経路、上記と表裏をなす）</p>
+            <p class="sh-meridian-subhead en">Yin Meridians (inner pathway, paired with the above)</p>
+            <ul>
+              <li><span class="ja">肺経（大腸経と表裏）— 橈骨神経に対応</span><span class="en">Lung Meridian (paired with Large Intestine) — associated with the radial nerve</span></li>
+              <li><span class="ja">心包経（三焦経と表裏）— 正中神経に対応</span><span class="en">Pericardium Meridian (paired with Triple Heater) — associated with the median nerve</span></li>
+              <li><span class="ja">心経（小腸経と表裏）— 尺骨神経に対応</span><span class="en">Heart Meridian (paired with Small Intestine) — associated with the ulnar nerve</span></li>
+            </ul>
+
+            <p class="ja">これらの対応関係は現代解剖学で普遍的に認められているものではありませんが、経絡の経路と触知できる動脈・神経が重なるという、長年の観察の積み重ねに基づいています。</p>
+            <p class="en">These correspondences are not universally accepted in modern anatomy, but they stem from centuries of observation linking meridian pathways to palpable arteries and nerves.</p>
           </div>
-        </div>
+        </details>
+
+        <!-- 3. 肺経 -->
+        <details class="sh-meridian-item">
+          <summary class="sh-meridian-head">
+            <span class="sh-meridian-head-text">
+              <span class="ja">肺経（はいけい）</span>
+              <span class="en">Lung Meridian</span>
+            </span>
+            <span class="sh-meridian-icon" aria-hidden="true"></span>
+          </summary>
+          <div class="sh-meridian-body">
+            <p class="ja">肺経が乱れると、大腸経（だいちょうけい）との表裏関係を反映して、次のような症状が現れることがあります。</p>
+            <p class="en">When the Lung Meridian falls out of balance, a range of symptoms may appear, reflecting its paired relationship with the Large Intestine.</p>
+            <ol>
+              <li><span class="ja">顔が時々赤らむ（ほてる）ことがある</span><span class="en">Occasional flushing or heat in the face</span></li>
+              <li><span class="ja">口が乾く</span><span class="en">Dryness of the mouth</span></li>
+              <li><span class="ja">胸のつかえ（閉塞感）がより強く現れる</span><span class="en">A stronger sense of tightness or oppression in the chest</span></li>
+              <li><span class="ja">咳が普段より頻繁に出る</span><span class="en">Coughing more frequently than usual</span></li>
+              <li><span class="ja">動悸が起こることがある</span><span class="en">Occasional heart palpitations</span></li>
+              <li><span class="ja">片方の腕にしびれが現れることがある</span><span class="en">Numbness in either arm</span></li>
+              <li><span class="ja">手のひらが汗ばみ、時に強い熱さを感じる</span><span class="en">Sweaty palms, sometimes with a sensation of extreme heat</span></li>
+              <li><span class="ja">声が突然高くなったり低くなったりする</span><span class="en">The voice shifting suddenly higher or lower</span></li>
+              <li><span class="ja">疲れやすくなり、全身の気力低下を感じる</span><span class="en">Increased fatigue and an overall sense of depleted energy</span></li>
+              <li><span class="ja">目の疲れや視力低下など、目にまつわる不調が現れることがある（肺経は目に関わるツボを通るため）</span><span class="en">Weakness affecting the eyes, such as blurred vision or eye fatigue — since the Lung Meridian passes through points connected to the eyes</span></li>
+              <li><span class="ja">辛い食べ物や、魚のような生臭いものを普段より欲するようになる</span><span class="en">Stronger-than-usual cravings for pungent or "fishy"-tasting foods</span></li>
+            </ol>
+            <p class="ja">これは中医学における肺経と大腸経の表裏関係に基づく考え方です。</p>
+            <p class="en">This pattern reflects the internal-external relationship between the Lung and Large Intestine meridians in TCM theory.</p>
+          </div>
+        </details>
+
+        <!-- 4. 心包経 -->
+        <details class="sh-meridian-item">
+          <summary class="sh-meridian-head">
+            <span class="sh-meridian-head-text">
+              <span class="ja">心包経（しんぽうけい）</span>
+              <span class="en">Pericardium Meridian</span>
+            </span>
+            <span class="sh-meridian-icon" aria-hidden="true"></span>
+          </summary>
+          <div class="sh-meridian-body">
+            <p class="ja">心包経（しんぽうけい）は、鍼灸や中医学における十二経絡のひとつで、心臓を包む膜「心包」に対応する経絡です。英語では「Pericardium Meridian」、または「心を守るもの（Heart Protector）」とも呼ばれます。</p>
+            <p class="en">The Pericardium Meridian, known in Japanese as Shinpoukei (心包経), is one of the twelve principal meridians in Traditional Chinese Medicine (TCM) and acupuncture. It corresponds to the pericardium, the protective membrane surrounding the heart, and is also referred to as the "Heart Protector."</p>
+            <p class="ja">この経絡の主な役割は、中医学で「君主の官」とされる心を、感情的なショックや外邪、過度の熱やストレスから守ることです。喜びや人間関係にまつわる感情を調整し、血の巡りを助け、心神（精神）を落ち着かせる働きがあります。</p>
+            <p class="en">Its primary role is to shield the Heart — regarded as the "Emperor" in TCM — from emotional shocks, external pathogens, and excessive heat or stress. The meridian helps regulate emotions related to joy and relationships, supports healthy circulation, and calms the mind.</p>
+            <p class="ja">中医学の理論上、心包は五臓（肝・心・脾・肺・腎）には数えられませんが、実際の施術では非常に重要視されており、感情のバランス、心臓関連の不調、胸のつかえ、不安、不眠、精神の安定などに広く用いられています。</p>
+            <p class="en">While the Pericardium is not counted among the five essential Zang organs in TCM theory, its meridian is widely used in practice — particularly for emotional balance, heart-related concerns, chest discomfort, anxiety, insomnia, and the protection of the spirit (Shen).</p>
+          </div>
+        </details>
+
+        <!-- 5. 胃経 -->
+        <details class="sh-meridian-item">
+          <summary class="sh-meridian-head">
+            <span class="sh-meridian-head-text">
+              <span class="ja">胃経（いけい）</span>
+              <span class="en">The Stomach Meridian</span>
+            </span>
+            <span class="sh-meridian-icon" aria-hidden="true"></span>
+          </summary>
+          <div class="sh-meridian-body">
+            <p class="ja">胃経（正式には足陽明胃経）は、中医学において土の元素に関連づけられる主要な陽経です。消化の中心的な役割を担い、食物や水分を受け取ってその分解を始め、全身に届けるための気と栄養へと変換します。これには胃・食道・十二指腸の働きを司ることに加え、食欲・代謝・体液の巡りへの影響も含まれます。身体的な消化にとどまらず、感情や経験を「消化」する助けともなり、思考過多や心配による負担を和らげ、心の明晰さを支えます。</p>
+            <p class="en">The Stomach Meridian — known as the Foot-Yangming Stomach Channel in Traditional Chinese Medicine — is a major Yang meridian associated with the Earth element. It plays a central role in digestion: receiving food and drink, initiating their breakdown, and transforming them into usable Qi and nutrients for distribution throughout the body. This includes governing the stomach, esophagus, and duodenum, as well as influencing appetite, metabolism, and the smooth circulation of body fluids. Beyond physical digestion, it also helps the body "digest" emotions and experiences, supporting mental clarity and easing the overload that comes from overthinking or worry.</p>
+            <p class="ja">経絡の経路は目の下から始まり、あごへ下り、額へ上がったのち、喉・胸・腹部を通って脚の前面を下り、足の第二趾に至ります。</p>
+            <p class="en">The meridian's pathway begins beneath the eye, descends to the jaw, rises to the forehead, then travels down through the throat, chest, and abdomen, continuing along the front of the leg to the second toe.</p>
+            <p class="ja">中医学の考え方をもとにした日本の施術法である指圧では、胃経の滞りが消化不良・生殖に関わる不調・月経不順・母乳分泌の問題・食欲の乱れなどにつながると考え、これを整えるために施術を行います。施術者は指・手のひら・肘・膝を用いて経絡の経路やツボ（経穴）に持続的な圧を加え、滞りを解放し、気の巡りを整えてバランスを取り戻します。これにより消化不良や膨満感、吐き気、それに伴う情緒的な負担の緩和が期待できます。たとえば足三里（ST-36）は、消化と免疫力を支えるツボとして指圧でもよく用いられます。</p>
+            <p class="en">In Shiatsu — a Japanese form of therapeutic bodywork rooted in TCM principles — the Stomach Meridian is treated to relieve blockages in the flow of Qi that can contribute to digestive trouble, reproductive concerns, menstrual irregularity, lactation issues, or appetite imbalance. Practitioners apply sustained pressure with the fingers, palms, elbows, or knees along the meridian's pathway or at specific points (tsubo) to release stagnation, restore healthy circulation, and support the body's balance. This can help ease symptoms such as indigestion, bloating, nausea, and related emotional stress. Point ST-36 (Zusanli), for example, is commonly used in Shiatsu to support digestion and immunity.</p>
+          </div>
+        </details>
+
+        <!-- 6. 任脈 -->
+        <details class="sh-meridian-item">
+          <summary class="sh-meridian-head">
+            <span class="sh-meridian-head-text">
+              <span class="ja">任脈（にんみゃく）</span>
+              <span class="en">The Conception Vessel (Ren Mai)</span>
+            </span>
+            <span class="sh-meridian-icon" aria-hidden="true"></span>
+          </summary>
+          <div class="sh-meridian-body">
+            <p class="ja">任脈（にんみゃく）（別名：Conception Vessel、Directing Vessel）は、中医学において最も重要な経絡のひとつです。「陰の海」と呼ばれ、体全体の陰のエネルギーを調整し、滋養する役割を担っています。</p>
+            <p class="en">The Conception Vessel — Ren Mai (任脈), also known as the Directing Vessel — is one of the most important channels in Traditional Chinese Medicine. Known as the "Sea of Yin," it governs and nourishes the Yin energy of the entire body.</p>
+
+            <p class="sh-meridian-subhead ja">任脈の主な機能</p>
+            <p class="sh-meridian-subhead en">Primary Functions</p>
+            <ul>
+              <li><span class="ja">全身の陰のエネルギーを司る（冷たく、滋養し、内向きで回復的な性質）</span><span class="en">Governing the body's Yin energy — cooling, nourishing, and restorative in nature</span></li>
+              <li><span class="ja">生殖機能に強い影響を与える — 月経、不妊、妊娠、出産、産後回復、更年期障害など、女性だけでなく男性の関連症状にも関わる</span><span class="en">Strongly influencing reproductive function — menstruation, fertility, pregnancy, childbirth, postpartum recovery, and menopause, as well as related concerns in men</span></li>
+              <li><span class="ja">子宮（男性では下腹部の対応するエネルギーセンター）、血、体液を調整する</span><span class="en">Regulating the uterus (or its corresponding energy center in men), blood, and bodily fluids</span></li>
+              <li><span class="ja">感情のバランス、消化、呼吸、ホルモン調整、全身の活力維持をサポートする</span><span class="en">Supporting emotional balance, digestion, breathing, hormonal regulation, and overall vitality</span></li>
+              <li><span class="ja">のぼせ、寝汗、口の渇き、不安、婦人科疾患、慢性疲労などの症状の治療に役立つ</span><span class="en">Being used in treatment for symptoms such as hot flashes, night sweats, dry mouth, anxiety, gynecological conditions, and chronic fatigue</span></li>
+            </ul>
+            <p class="ja">任脈は奇経八脈の一つで、通常の十二経脈に対してより深く根本的なエネルギーの貯蔵庫として機能します。</p>
+            <p class="en">As one of the Eight Extraordinary Vessels, the Conception Vessel acts as a deep reservoir of energy underlying the twelve principal meridians.</p>
+
+            <p class="sh-meridian-subhead ja">任脈の経路</p>
+            <p class="sh-meridian-subhead en">Pathway</p>
+            <p class="ja">任脈は身体の前面正中線を正確に走行するため、視覚化しやすくアクセスしやすい経絡です。</p>
+            <p class="en">Its pathway runs along the exact midline of the body's front, making it easy to visualize.</p>
+            <ol>
+              <li><span class="ja">起始 — 体内深く、腎臓の間（女性では子宮、男性では下腹部とされる）から始まる</span><span class="en">It begins deep within the body, between the kidneys (the uterus in women; the lower abdomen in men).</span></li>
+              <li><span class="ja">下行して体表に出るのが任-1（会陰・えいん）— 会陰部（肛門と性器の間）</span><span class="en">It surfaces at CV-1 (Huiyin), at the perineum.</span></li>
+              <li>
+                <span class="ja">そこから身体の正中線を直線的に上行する</span>
+                <span class="en">From there it ascends straight up the front midline</span>
+                <ul>
+                  <li><span class="ja">性器と下腹部の上（重要なツボ：任-3 中極、任-4 関元、任-6 気海 — 生殖とエネルギー貯蔵に重要）</span><span class="en">passing above the genitals and lower abdomen (key points CV-3, CV-4, and CV-6 — vital for reproduction and energy storage)</span></li>
+                  <li><span class="ja">臍（へそ）の領域を通る</span><span class="en">through the navel area</span></li>
+                  <li><span class="ja">胸部と胸骨に沿って（任-17 膻中 — 胸・呼吸に影響する重要なツボ）</span><span class="en">along the chest and sternum (CV-17, an important point for the chest and breathing)</span></li>
+                  <li><span class="ja">喉と頸部を通る</span><span class="en">through the throat and neck</span></li>
+                </ul>
+              </li>
+              <li><span class="ja">任-24（承漿・しょうしょう）で終わる — 下唇の下の溝（オトガイ唇溝）</span><span class="en">It ends at CV-24 (Chengjiang), in the groove beneath the lower lip.</span></li>
+              <li><span class="ja">内部の継続する枝 — 口、唇に内部でつながり、目下のツボや督脈（Du Mai）と連絡する</span><span class="en">Internal branches continue to connect with the mouth and lips, points near the eyes, and the Governing Vessel (Du Mai).</span></li>
+            </ol>
+            <p class="ja">要するに、任脈は会陰 → 陰部 → 臍 → 胸 → 喉 → 口まで、胴体と頭部の前面全体の正中線を形成します。</p>
+            <p class="en">In short, the Conception Vessel forms the central midline of the body's front — from the perineum, through the genitals, navel, chest, and throat, to the mouth.</p>
+
+            <p class="sh-meridian-subhead ja">身体とのつながり</p>
+            <p class="sh-meridian-subhead en">Connections Throughout the Body</p>
+            <p class="ja">任脈は非常に広範なつながりを持ち、それがその強力さの理由です。</p>
+            <p class="en">Because of its extensive connections, the Conception Vessel is especially influential.</p>
+            <ul>
+              <li><span class="ja">すべての陰経（肺経、心経、心包経、脾経、腎経、肝経）と連結し、それらの「集まる点」として機能する</span><span class="en">It links and gathers all the Yin meridians (Lung, Heart, Pericardium, Spleen, Kidney, and Liver)</span></li>
+              <li><span class="ja">生殖器（子宮、性器）、腎臓、下丹田（臍の下のエネルギーセンター）と深くつながる</span><span class="en">It connects deeply with the reproductive organs, kidneys, and the Lower Dantian (the energy center below the navel)</span></li>
+              <li><span class="ja">督脈（背面正中線の経絡）と密接に関連し、気功でよく用いられる完全な回路（小周天）を形成する</span><span class="en">It works closely with the Governing Vessel along the back midline, together forming the circuit used in Qigong practice known as the Microcosmic Orbit</span></li>
+              <li><span class="ja">衝脈など他の奇経八脈とも関係し、下腹部・腎臓領域で共通の起源を持つ</span><span class="en">It relates to other Extraordinary Vessels such as the Penetrating Vessel (Chong Mai), sharing a common origin in the lower abdomen and kidney region</span></li>
+              <li><span class="ja">表層の経路が腸、胃、心臓・肺、喉などの主要臓器を直接覆っているため、この経絡上のツボはこれらの領域に強力に影響を与える</span><span class="en">Because its pathway lies directly over major organs — the intestines, stomach, heart, lungs, and throat — points along this meridian have a strong influence on these areas</span></li>
+            </ul>
+            <p class="ja">簡単に言うと、任脈は陰の滋養エネルギーの中央ハイウェイのようなもので、会陰から口まで身体の前面中央を走り、生殖、感情、全身のバランスに深く関わる経絡です。鍼灸や気功では、活力向上や女性の健康問題の治療に最も頻繁に用いられるチャンネルの一つです。</p>
+            <p class="en">In short, the Conception Vessel is like a central highway of nourishing Yin energy, running along the front midline of the body from the perineum to the mouth. In acupuncture and Qigong, it is one of the most frequently used channels for restoring vitality and treating women's health concerns.</p>
+          </div>
+        </details>
+
+        <!-- 7. 耳鳴り -->
+        <details class="sh-meridian-item">
+          <summary class="sh-meridian-head">
+            <span class="sh-meridian-head-text">
+              <span class="ja">耳鳴りについて</span>
+              <span class="en">About Tinnitus</span>
+            </span>
+            <span class="sh-meridian-icon" aria-hidden="true"></span>
+          </summary>
+          <div class="sh-meridian-body">
+            <p class="ja">耳鳴り（みみなり）とは、実際には外部から音が鳴っていないにもかかわらず、耳や頭の中で音を感じる状態を指す医学用語です。それ自体がひとつの病気というわけではなく、さまざまな不調のサインとして現れる症状です。</p>
+            <p class="en">Tinnitus is the medical term for perceiving sound in the ears or head without any actual external source. It is not a disease in itself, but a symptom that can accompany a variety of underlying conditions.</p>
+            <p class="ja">多くの方は「持続的な、あるいは断続的なキーンという音」と表現しますが、ブーンという低い音・シューという音・轟くような音・ヒューという音・カチカチという音として感じられることもあります。世界中で非常に多くの人に見られる症状で、成人の10〜25%が人生のどこかで経験すると言われています。多くの場合は本人にしか聞こえない主観的なものですが、まれに医師が確認できる客観的な耳鳴り（血流の問題に関連することが多い）もあります。</p>
+            <p class="en">Most people describe it as a constant or intermittent ringing, though it can also present as buzzing, hissing, roaring, whistling, clicking, or a whooshing sound. It affects a significant portion of the population — estimates suggest that 10 to 25% of adults experience it at some point in their lives. In most cases it is subjective, meaning only the person experiencing it can hear it, though in rare cases it can be objective and detectable by a clinician, often related to blood-flow issues.</p>
+            <p class="ja">主な原因としては、加齢による聴力低下、大きな音への曝露、耳垢の蓄積、耳の感染症、特定の薬剤の影響、頭部や首の外傷などが挙げられます。</p>
+            <p class="en">Common causes include age-related hearing loss, exposure to loud noise, earwax buildup, ear infections, certain medications, and head or neck injuries.</p>
+            <p class="ja">耳鳴りは煩わしく、つらく感じられることがありますが、生命に関わる重大な病気のサインであることはまれです。万能な治療法はありませんが、音響療法、補聴器、ストレスの軽減などによって、多くの方が症状の緩和に成功しています。</p>
+            <p class="en">While tinnitus can be distressing, it is rarely a sign of a serious underlying condition. There is no single universal cure, but many people find relief through sound therapy, hearing aids, stress reduction, and other supportive approaches.</p>
+          </div>
+        </details>
 
       </div>
     </div>
@@ -96,7 +284,7 @@ const testimonialVideos = allVideos.filter(v => v.data.category === "shiatsu-tes
   <section class="sh-quote surface-white">
     <div class="sh-inner">
       <blockquote class="reveal">
-        <h2><span class="ja">泰山流指圧について</span><span class="en">About Taizan-ryu Shiatsu</span></h2>
+        <h2><span class="ja">私の歩み　泰山流指圧</span><span class="en">My Journey: Taizan-ryu Shiatsu</span></h2>
 
         <h3><span class="ja">泰山流指圧の誕生</span><span class="en">Birth of Taizan-ryu Shiatsu</span></h3>
         <p class="ja">
@@ -171,8 +359,8 @@ const testimonialVideos = allVideos.filter(v => v.data.category === "shiatsu-tes
       </div>
 
       <div class="sh-cert-grid reveal">
-        <img src={images.certificate1} alt="指圧認定証 1" />
-        <img src={images.certificate2} alt="指圧認定証 2" />
+        <img src={shiatsuCertificates[0]} alt="指圧認定証 1" />
+        <img src={shiatsuCertificates[1]} alt="指圧認定証 2" />
       </div>
 
     </div>
@@ -189,7 +377,7 @@ const testimonialVideos = allVideos.filter(v => v.data.category === "shiatsu-tes
       <div class="sh-book-row reveal">
         <div class="sh-book-image">
           <img
-            src={images.shiatsuTextbook1}
+            src={shiatsuTextbook1}
             alt="Healing Touch: The Complete Guide"
           />
         </div>
@@ -230,7 +418,7 @@ const testimonialVideos = allVideos.filter(v => v.data.category === "shiatsu-tes
         <p class="ja">施術を受けられたお客様からいただいた、率直な感想をご紹介します。</p>
         <p class="en">Read what our clients have to say about their experience with Taizan-ryu Shiatsu.</p>
         <img
-          src="https://pub-488a24026ed4411b8d591260b603cdd1.r2.dev/shiatsu/SHIATSU_Testimonials_260610.jpg"
+          src={shiatsuTestimonialsImage}
           alt="お客様の声"
           class="sh-testimonials-img">
         <a href="/testimonials" class="sh-testimonials-btn">
@@ -243,121 +431,25 @@ const testimonialVideos = allVideos.filter(v => v.data.category === "shiatsu-tes
 
 </Base>
 
+<script>
+  // 経絡アコーディオン：ひとつ開くと他は自動的に閉じる
+  const meridianItems = document.querySelectorAll<HTMLDetailsElement>(".sh-meridian-item");
+  meridianItems.forEach((item) => {
+    item.addEventListener("toggle", () => {
+      if (!item.open) return;
+      meridianItems.forEach((other) => {
+        if (other !== item) other.open = false;
+      });
+    });
+  });
+</script>
+
 <style>
   /* ===== 共通 ===== */
   .sh-inner {
     max-width: 1100px;
     margin: 0 auto;
     padding: 0 40px;
-  }
-
-  /* ===== ヒーロー ===== */
-  .sh-hero {
-    position: relative;
-    width: 100%;
-    height: 100vh;
-    min-height: 600px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-  }
-
-  .sh-hero-bg {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-  }
-
-  .sh-hero-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-      to bottom,
-      rgba(0, 0, 0, 0.35) 0%,
-      rgba(30, 20, 10, 0.7) 100%
-    );
-  }
-
-  .sh-hero-content {
-    position: relative;
-    z-index: 2;
-    text-align: center;
-    color: #fff;
-    padding: 0 20px;
-  }
-
-  .sh-eyebrow {
-    font-size: 0.85rem;
-    letter-spacing: 5px;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.7);
-    margin-bottom: 24px;
-    opacity: 0;
-    animation: shFadeUp 0.8s ease 0.2s forwards;
-  }
-
-  .sh-hero-title {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-bottom: 28px;
-  }
-
-  .line-a {
-    font-size: clamp(3rem, 8vw, 6rem);
-    font-weight: 600;
-    letter-spacing: 6px;
-    opacity: 0;
-    animation: shFadeUp 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 0.4s forwards;
-  }
-
-  .line-b {
-    font-size: clamp(2rem, 5vw, 3.8rem);
-    font-weight: 300;
-    letter-spacing: 8px;
-    color: rgba(255, 255, 255, 0.85);
-    opacity: 0;
-    animation: shFadeUp 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 0.6s forwards;
-  }
-
-  .sh-hero-sub {
-    font-size: 1rem;
-    letter-spacing: 3px;
-    color: rgba(255, 255, 255, 0.7);
-    opacity: 0;
-    animation: shFadeUp 0.8s ease 0.9s forwards;
-  }
-
-  .sh-hero-scroll {
-    position: absolute;
-    bottom: 40px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 2;
-  }
-
-  .sh-hero-scroll span {
-    display: block;
-    width: 1px;
-    height: 60px;
-    background: linear-gradient(to bottom, rgba(255,255,255,0.6), transparent);
-    margin: 0 auto;
-    animation: shScrollLine 2s ease-in-out infinite;
-  }
-
-  @keyframes shFadeUp {
-    from { opacity: 0; transform: translateY(24px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes shScrollLine {
-    0%   { transform: scaleY(0); transform-origin: top; opacity: 1; }
-    50%  { transform: scaleY(1); transform-origin: top; opacity: 1; }
-    100% { transform: scaleY(1); transform-origin: top; opacity: 0; }
   }
 
   /* ===== 説明セクション ===== */
@@ -552,6 +644,135 @@ const testimonialVideos = allVideos.filter(v => v.data.category === "shiatsu-tes
     color: var(--text-secondary);
   }
 
+  /* ===== 経絡についてセクション（アコーディオン） ===== */
+  .sh-meridians {
+    padding: 100px 0;
+  }
+
+  .sh-meridian-list {
+    max-width: 760px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .sh-meridian-item {
+    background-color: #fff;
+    border: 1px solid rgba(58, 42, 32, 0.12);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .sh-meridian-item[open] {
+    border-color: rgba(107, 31, 35, 0.3);
+  }
+
+  .sh-meridian-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 22px 28px;
+    cursor: pointer;
+    list-style: none;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: #2a1a10;
+    transition: background-color 0.2s ease;
+  }
+
+  .sh-meridian-head::-webkit-details-marker {
+    display: none;
+  }
+
+  .sh-meridian-head:hover {
+    background-color: rgba(107, 31, 35, 0.04);
+  }
+
+  .sh-meridian-icon {
+    position: relative;
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+  }
+
+  .sh-meridian-icon::before,
+  .sh-meridian-icon::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    background-color: rgba(107, 31, 35, 0.7);
+    transform: translate(-50%, -50%);
+    transition: transform 0.25s ease;
+  }
+
+  .sh-meridian-icon::before {
+    width: 14px;
+    height: 2px;
+  }
+
+  .sh-meridian-icon::after {
+    width: 2px;
+    height: 14px;
+  }
+
+  .sh-meridian-item[open] .sh-meridian-icon::after {
+    transform: translate(-50%, -50%) rotate(90deg) scale(0);
+  }
+
+  .sh-meridian-body {
+    padding: 0 28px 24px;
+  }
+
+  .sh-meridian-body p {
+    font-size: 0.95rem;
+    line-height: 2;
+    color: #3a2a20;
+    margin-bottom: 16px;
+  }
+
+  .sh-meridian-body p:last-child {
+    margin-bottom: 0;
+  }
+
+  .sh-meridian-body p.sh-meridian-subhead {
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    color: #7a5a4a;
+    margin-bottom: 10px;
+  }
+
+  .sh-meridian-body ul,
+  .sh-meridian-body ol {
+    margin: 0 0 16px;
+    padding-left: 1.4em;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .sh-meridian-body ul {
+    list-style: disc;
+  }
+
+  .sh-meridian-body ol {
+    list-style: decimal;
+  }
+
+  .sh-meridian-body li {
+    font-size: 0.95rem;
+    line-height: 1.9;
+    color: #3a2a20;
+  }
+
+  .sh-meridian-body li ul {
+    margin: 10px 0 0;
+  }
+
   /* ===== 宗家の言葉 ===== */
   .sh-quote {
     padding: 100px 0;
@@ -682,22 +903,6 @@ const testimonialVideos = allVideos.filter(v => v.data.category === "shiatsu-tes
     text-align: center;
   }
 
-  .sh-btn-outline {
-    display: inline-block;
-    padding: 14px 36px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 30px;
-    font-size: 0.9rem;
-    letter-spacing: 1px;
-    color: var(--text-primary);
-    transition: background-color 0.3s ease, border-color 0.3s ease;
-  }
-
-  .sh-btn-outline:hover {
-    background-color: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.6);
-  }
-
   /* ===== レスポンシブ ===== */
   @media (max-width: 900px) {
     .sh-inner {
@@ -707,9 +912,18 @@ const testimonialVideos = allVideos.filter(v => v.data.category === "shiatsu-tes
     .sh-desc,
     .sh-certs,
     .sh-books,
+    .sh-meridians,
     .sh-quote,
     .sh-videos {
       padding: 60px 0;
+    }
+
+    .sh-meridian-head {
+      padding: 18px 20px;
+    }
+
+    .sh-meridian-body {
+      padding: 0 20px 20px;
     }
 
     .sh-pillars {

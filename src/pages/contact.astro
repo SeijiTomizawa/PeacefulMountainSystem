@@ -1,125 +1,5 @@
 ---
 import Base from "../layouts/Base.astro";
-import { env } from "cloudflare:workers";
-
-type FormStatus = "idle" | "success" | "error";
-let formStatus: FormStatus = "idle";
-let formError = "";
-let submittedValues = { name: "", email: "", phone: "", inquiry_type: "", message: "" };
-
-if (Astro.request.method === "POST") {
-  try {
-    const data = await Astro.request.formData();
-    const name         = data.get("name")?.toString().trim()         ?? "";
-    const email        = data.get("email")?.toString().trim()        ?? "";
-    const phone        = data.get("phone")?.toString().trim()        ?? "";
-    const inquiryType  = data.get("inquiry_type")?.toString()        ?? "";
-    const message      = data.get("message")?.toString().trim()      ?? "";
-
-    submittedValues = { name, email, phone, inquiry_type: inquiryType, message };
-
-    // バリデーション
-    if (!name || !email || !message) {
-      formStatus = "error";
-      formError = "必須項目をすべて入力してください。 / Please fill in all required fields.";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      formStatus = "error";
-      formError = "有効なメールアドレスを入力してください。 / Please enter a valid email address.";
-    } else {
-      // D1 に保存
-      const db = (env as any).DB;
-      await db.prepare(`
-        CREATE TABLE IF NOT EXISTS contact_submissions (
-          id          TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
-          name        TEXT NOT NULL,
-          email       TEXT NOT NULL,
-          phone       TEXT,
-          inquiry_type TEXT,
-          message     TEXT NOT NULL,
-          created_at  TEXT DEFAULT (datetime('now', 'localtime'))
-        )
-      `).run();
-
-      await db.prepare(`
-        INSERT INTO contact_submissions (name, email, phone, inquiry_type, message)
-        VALUES (?, ?, ?, ?, ?)
-      `).bind(name, email, phone || null, inquiryType || null, message).run();
-
-      // Resend でメール通知
-      const resendApiKey  = (env as any).RESEND_API_KEY  as string | undefined;
-      const fromEmail     = (env as any).CONTACT_FROM_EMAIL as string | undefined;
-      const toEmail       = (env as any).CONTACT_TO_EMAIL  as string | undefined;
-
-      if (resendApiKey && fromEmail && toEmail) {
-        const inquiryLabels: Record<string, string> = {
-          trial:   "体験稽古・入門",
-          shiatsu: "指圧整体のご予約",
-          dojo:    "道場・流派について",
-          other:   "その他",
-        };
-        const inquiryLabel = inquiryLabels[inquiryType] ?? inquiryType ?? "未選択";
-
-        const subject = `[泰山流 お問い合わせ] ${inquiryLabel} — ${name} 様`;
-
-        const textBody = [
-          `■ お名前　　: ${name}`,
-          `■ メール　　: ${email}`,
-          `■ 電話番号　: ${phone || "（未入力）"}`,
-          `■ 種別　　　: ${inquiryLabel}`,
-          ``,
-          `■ メッセージ`,
-          message,
-          ``,
-          `──────────────────`,
-          `泰山流護身術・逮捕術 東京八王子本部道場`,
-          `https://peacefulmountainsystem.com`,
-        ].join("\n");
-
-        const htmlBody = `
-          <div style="font-family:sans-serif;max-width:600px;margin:0 auto;">
-            <h2 style="color:#6B1F23;border-bottom:2px solid #6B1F23;padding-bottom:8px;">
-              泰山流 お問い合わせ
-            </h2>
-            <table style="width:100%;border-collapse:collapse;margin:20px 0;">
-              <tr><td style="padding:8px 12px;background:#f9f6f2;font-weight:bold;width:120px;">お名前</td><td style="padding:8px 12px;">${name}</td></tr>
-              <tr><td style="padding:8px 12px;background:#f9f6f2;font-weight:bold;">メール</td><td style="padding:8px 12px;"><a href="mailto:${email}">${email}</a></td></tr>
-              <tr><td style="padding:8px 12px;background:#f9f6f2;font-weight:bold;">電話番号</td><td style="padding:8px 12px;">${phone || "（未入力）"}</td></tr>
-              <tr><td style="padding:8px 12px;background:#f9f6f2;font-weight:bold;">種別</td><td style="padding:8px 12px;">${inquiryLabel}</td></tr>
-            </table>
-            <h3 style="color:#6B1F23;">メッセージ</h3>
-            <div style="background:#f9f6f2;padding:16px;border-radius:6px;white-space:pre-wrap;">${message}</div>
-            <hr style="margin:32px 0;border:none;border-top:1px solid #ddd;">
-            <p style="color:#888;font-size:12px;">泰山流護身術・逮捕術 東京八王子本部道場</p>
-          </div>`;
-
-        const res = await fetch("https://api.resend.com/emails", {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${resendApiKey}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            from: `泰山流 お問い合わせフォーム <${fromEmail}>`,
-            to:   [toEmail],
-            reply_to: email,
-            subject,
-            text: textBody,
-            html: htmlBody,
-          }),
-        });
-
-        if (!res.ok) {
-          throw new Error(await res.text());
-        }
-      }
-
-      formStatus = "success";
-    }
-  } catch (e) {
-    formStatus = "error";
-    formError = "送信に失敗しました。時間をおいてから再度お試しください。 / Something went wrong. Please try again later.";
-  }
-}
 ---
 
 <Base
@@ -182,123 +62,109 @@ if (Astro.request.method === "POST") {
 
         <!-- 右：フォーム -->
         <div class="ct-form-wrapper reveal">
-          {formStatus === "success" ? (
-            <div class="ct-success">
-              <div class="ct-success-icon">✓</div>
-              <h3><span class="ja">送信完了</span><span class="en">Message Sent</span></h3>
-              <p class="ja">お問い合わせありがとうございます。<br>通常2〜3営業日以内にご返信いたします。</p>
-              <p class="en">Thank you for reaching out.<br>We'll get back to you within 2–3 business days.</p>
-              <a href="/contact" class="ct-btn-secondary">
-                <span class="ja">別の内容を送る</span>
-                <span class="en">Send Another Message</span>
-              </a>
+
+          <!-- 送信成功 -->
+          <div class="ct-success" id="ct-success" hidden>
+            <div class="ct-success-icon">✓</div>
+            <h3><span class="ja">送信完了</span><span class="en">Message Sent</span></h3>
+            <p class="ja">お問い合わせありがとうございます。<br>通常2〜3営業日以内にご返信いたします。</p>
+            <p class="en">Thank you for reaching out.<br>We'll get back to you within 2–3 business days.</p>
+            <button type="button" class="ct-btn-secondary" id="ct-send-another">
+              <span class="ja">別の内容を送る</span>
+              <span class="en">Send Another Message</span>
+            </button>
+          </div>
+
+          <!-- フォーム -->
+          <form class="ct-form" id="ct-form" novalidate>
+            <div class="ct-error-banner" id="ct-error-banner" hidden role="alert">
+              <span id="ct-error-text"></span>
             </div>
-          ) : (
-            <form method="POST" class="ct-form" novalidate>
-              {formStatus === "error" && (
-                <div class="ct-error-banner" role="alert">
-                  <span>{formError}</span>
-                </div>
-              )}
 
-              <!-- 氏名 / Email 行 -->
-              <div class="ct-row">
-                <div class="ct-field">
-                  <label for="name">
-                    <span class="ja">氏名</span><span class="en">Name</span>
-                    <span class="ct-required">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    required
-                    autocomplete="name"
-                    value={submittedValues.name}
-                    placeholder="山田 太郎 / Taro Yamada"
-                  />
-                </div>
-                <div class="ct-field">
-                  <label for="email">
-                    <span class="ja">メールアドレス</span><span class="en">Email</span>
-                    <span class="ct-required">*</span>
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    required
-                    autocomplete="email"
-                    value={submittedValues.email}
-                    placeholder="example@email.com"
-                  />
-                </div>
-              </div>
-
-              <!-- 電話番号 / お問い合わせ種別 行 -->
-              <div class="ct-row">
-                <div class="ct-field">
-                  <label for="phone">
-                    <span class="ja">お電話番号</span><span class="en">Phone</span>
-                    <span class="ct-optional ja">（任意）</span>
-                    <span class="ct-optional en">(optional)</span>
-                  </label>
-                  <input
-                    type="tel"
-                    id="phone"
-                    name="phone"
-                    autocomplete="tel"
-                    value={submittedValues.phone}
-                    placeholder="042-xxx-xxxx"
-                  />
-                </div>
-                <div class="ct-field">
-                  <label for="inquiry_type">
-                    <span class="ja">お問い合わせ種別</span><span class="en">Inquiry Type</span>
-                    <span class="ct-optional ja">（任意）</span>
-                    <span class="ct-optional en">(optional)</span>
-                  </label>
-                  <select id="inquiry_type" name="inquiry_type">
-                    <option value="" disabled={true} selected={!submittedValues.inquiry_type}>
-                      選択してください / Please select
-                    </option>
-                    <option value="trial" selected={submittedValues.inquiry_type === "trial"}>
-                      体験稽古・入門 / Trial Class
-                    </option>
-                    <option value="shiatsu" selected={submittedValues.inquiry_type === "shiatsu"}>
-                      指圧整体のご予約 / Shiatsu Appointment
-                    </option>
-                    <option value="dojo" selected={submittedValues.inquiry_type === "dojo"}>
-                      道場・流派について / About the Dojo
-                    </option>
-                    <option value="other" selected={submittedValues.inquiry_type === "other"}>
-                      その他 / Other
-                    </option>
-                  </select>
-                </div>
-              </div>
-
-              <!-- メッセージ -->
+            <!-- 氏名 / Email 行 -->
+            <div class="ct-row">
               <div class="ct-field">
-                <label for="message">
-                  <span class="ja">メッセージ</span><span class="en">Message</span>
+                <label for="name">
+                  <span class="ja">氏名</span><span class="en">Name</span>
                   <span class="ct-required">*</span>
                 </label>
-                <textarea
-                  id="message"
-                  name="message"
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
                   required
-                  rows={6}
-                  placeholder="ご質問・ご相談内容をご記入ください / Please describe your inquiry..."
-                >{submittedValues.message}</textarea>
+                  autocomplete="name"
+                  placeholder="山田 太郎 / Taro Yamada"
+                />
               </div>
+              <div class="ct-field">
+                <label for="email">
+                  <span class="ja">メールアドレス</span><span class="en">Email</span>
+                  <span class="ct-required">*</span>
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  required
+                  autocomplete="email"
+                  placeholder="example@email.com"
+                />
+              </div>
+            </div>
 
-              <button type="button" id="ct-confirm-btn" class="ct-btn-primary">
-                <span class="ja">内容を確認する</span>
-                <span class="en">Review & Send</span>
-              </button>
-            </form>
-          )}
+            <!-- 電話番号 / お問い合わせ種別 行 -->
+            <div class="ct-row">
+              <div class="ct-field">
+                <label for="phone">
+                  <span class="ja">お電話番号</span><span class="en">Phone</span>
+                  <span class="ct-optional ja">（任意）</span>
+                  <span class="ct-optional en">(optional)</span>
+                </label>
+                <input
+                  type="tel"
+                  id="phone"
+                  name="phone"
+                  autocomplete="tel"
+                  placeholder="042-xxx-xxxx"
+                />
+              </div>
+              <div class="ct-field">
+                <label for="inquiry_type">
+                  <span class="ja">お問い合わせ種別</span><span class="en">Inquiry Type</span>
+                  <span class="ct-optional ja">（任意）</span>
+                  <span class="ct-optional en">(optional)</span>
+                </label>
+                <select id="inquiry_type" name="inquiry_type">
+                  <option value="">選択してください / Please select</option>
+                  <option value="trial">体験稽古・入門 / Trial Class</option>
+                  <option value="shiatsu">指圧整体のご予約 / Shiatsu Appointment</option>
+                  <option value="dojo">道場・流派について / About the Dojo</option>
+                  <option value="other">その他 / Other</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- メッセージ -->
+            <div class="ct-field">
+              <label for="message">
+                <span class="ja">メッセージ</span><span class="en">Message</span>
+                <span class="ct-required">*</span>
+              </label>
+              <textarea
+                id="message"
+                name="message"
+                required
+                rows={6}
+                placeholder="ご質問・ご相談内容をご記入ください / Please describe your inquiry..."
+              ></textarea>
+            </div>
+
+            <button type="button" id="ct-confirm-btn" class="ct-btn-primary">
+              <span class="ja">内容を確認する</span>
+              <span class="en">Review & Send</span>
+            </button>
+          </form>
         </div>
 
       </div>
@@ -364,11 +230,15 @@ if (Astro.request.method === "POST") {
       other:   "その他 / Other",
     };
 
-    const form       = document.querySelector<HTMLFormElement>(".ct-form");
-    const confirmBtn = document.getElementById("ct-confirm-btn");
-    const modal      = document.getElementById("ct-modal") as HTMLElement;
-    const cancelBtn  = document.getElementById("ct-modal-cancel");
-    const submitBtn  = document.getElementById("ct-modal-submit");
+    const form        = document.getElementById("ct-form")        as HTMLFormElement | null;
+    const successDiv  = document.getElementById("ct-success")     as HTMLElement | null;
+    const confirmBtn  = document.getElementById("ct-confirm-btn") as HTMLButtonElement | null;
+    const errorBanner = document.getElementById("ct-error-banner") as HTMLElement | null;
+    const errorText   = document.getElementById("ct-error-text");
+    const modal       = document.getElementById("ct-modal")       as HTMLElement | null;
+    const cancelBtn   = document.getElementById("ct-modal-cancel");
+    const submitBtn   = document.getElementById("ct-modal-submit") as HTMLButtonElement | null;
+    const sendAnother = document.getElementById("ct-send-another");
 
     function setText(id: string, value: string) {
       const el = document.getElementById(id);
@@ -380,9 +250,19 @@ if (Astro.request.method === "POST") {
       if (el) el.hidden = !visible;
     }
 
+    function showError(msg: string) {
+      if (errorBanner && errorText) {
+        errorText.textContent = msg;
+        errorBanner.hidden = false;
+      }
+    }
+
+    function hideError() {
+      if (errorBanner) errorBanner.hidden = true;
+    }
+
     function openModal() {
       if (!form) return;
-
       if (!form.checkValidity()) {
         form.reportValidity();
         return;
@@ -398,22 +278,20 @@ if (Astro.request.method === "POST") {
       setText("cm-name",    name);
       setText("cm-email",   email);
       setText("cm-message", message);
-
-      setText("cm-phone", phone);
+      setText("cm-phone",   phone);
       setRowVisible("cm-phone-row", !!phone);
-
-      setText("cm-type", LABELS[inquiryType] ?? inquiryType);
+      setText("cm-type",    LABELS[inquiryType] ?? inquiryType);
       setRowVisible("cm-type-row", !!inquiryType);
 
-      modal.setAttribute("aria-hidden", "false");
-      modal.classList.add("is-open");
+      modal?.setAttribute("aria-hidden", "false");
+      modal?.classList.add("is-open");
       document.body.style.overflow = "hidden";
       submitBtn?.focus();
     }
 
     function closeModal() {
-      modal.setAttribute("aria-hidden", "true");
-      modal.classList.remove("is-open");
+      modal?.setAttribute("aria-hidden", "true");
+      modal?.classList.remove("is-open");
       document.body.style.overflow = "";
       confirmBtn?.focus();
     }
@@ -421,27 +299,65 @@ if (Astro.request.method === "POST") {
     confirmBtn?.addEventListener("click", openModal);
     cancelBtn?.addEventListener("click", closeModal);
 
-    submitBtn?.addEventListener("click", function () {
+    submitBtn?.addEventListener("click", async function () {
       if (!form) return;
-      const hidden = document.createElement("input");
-      hidden.type  = "hidden";
-      hidden.name  = "_confirmed";
-      hidden.value = "1";
-      form.appendChild(hidden);
-      form.submit();
+      submitBtn.disabled = true;
+
+      try {
+        const fd = new FormData(form);
+        const res = await fetch("/api/contact", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name:         String(fd.get("name")         ?? "").trim(),
+            email:        String(fd.get("email")        ?? "").trim(),
+            phone:        String(fd.get("phone")        ?? "").trim(),
+            inquiry_type: String(fd.get("inquiry_type") ?? ""),
+            message:      String(fd.get("message")      ?? "").trim(),
+          }),
+        });
+
+        const json = await res.json() as { ok?: boolean; error?: string };
+        closeModal();
+
+        if (json.ok) {
+          form.hidden = true;
+          hideError();
+          if (successDiv) successDiv.hidden = false;
+        } else {
+          showError(json.error ?? "送信に失敗しました。時間をおいてから再度お試しください。 / Something went wrong. Please try again later.");
+        }
+      } catch {
+        closeModal();
+        showError("送信に失敗しました。時間をおいてから再度お試しください。 / Something went wrong. Please try again later.");
+      } finally {
+        submitBtn.disabled = false;
+      }
     });
 
-    modal.addEventListener("click", function (e) {
+    sendAnother?.addEventListener("click", function () {
+      if (successDiv) successDiv.hidden = true;
+      if (form) {
+        form.reset();
+        form.hidden = false;
+      }
+      hideError();
+    });
+
+    modal?.addEventListener("click", function (e) {
       if (e.target === modal) closeModal();
     });
 
     document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape" && modal.classList.contains("is-open")) closeModal();
+      if (e.key === "Escape" && modal?.classList.contains("is-open")) closeModal();
     });
   });
 </script>
 
 <style>
+  /* hidden 属性を CSS の display プロパティで上書きさせない */
+  [hidden] { display: none !important; }
+
   /* ===== 共通 ===== */
   .ct-inner {
     max-width: 1100px;
@@ -754,6 +670,9 @@ if (Astro.request.method === "POST") {
     font-size: 0.88rem;
     font-weight: 600;
     letter-spacing: 1px;
+    cursor: pointer;
+    background: none;
+    font-family: inherit;
     transition: border-color 0.2s ease, background-color 0.2s ease;
   }
 
@@ -828,10 +747,6 @@ if (Astro.request.method === "POST") {
     max-height: 90vh;
     overflow-y: auto;
     box-shadow: 0 24px 64px rgba(0, 0, 0, 0.3);
-    animation: ctModalIn 0.25s ease forwards;
-  }
-
-  .ct-modal-backdrop.is-open .ct-modal {
     animation: ctModalIn 0.25s ease forwards;
   }
 

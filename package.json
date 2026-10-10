@@ -5,18 +5,15 @@
 	"type": "module",
 	"scripts": {
 		"dev": "astro dev",
+		"dev:pages": "astro build && wrangler pages dev dist",
 		"build": "astro build",
 		"preview": "astro preview",
-		"deploy": "astro build && wrangler deploy",
-		"deploy:dev": "astro build && wrangler deploy --env dev",
-		"typecheck": "astro check" 
+		"deploy": "astro build && wrangler pages deploy dist --project-name peaceful-mountain-system",
+		"typecheck": "astro check"
 	},
 	"dependencies": {
-		"@astrojs/cloudflare": "^13.1.6",
 		"@astrojs/react": "^5.0.0",
-    "@emdash-cms/cloudflare": "^0.1.0",
-		"astro": "^6.1.2",
-    "emdash": "^0.1.0",
+		"astro": "^6.4.8",
 		"react": "^19.2.4",
 		"react-dom": "^19.2.4"
 	},

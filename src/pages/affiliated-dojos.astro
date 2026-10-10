@@ -2,6 +2,8 @@
 import Base from "../layouts/Base.astro";
 import images from "../components/blocks/images";
 
+import HeroCarousel from "../components/HeroCarousel.astro";
+
 const dojos = [
   {
     id: "DOJO_01",
@@ -52,36 +54,26 @@ const dojos = [
   title="友好関係の道場 | 泰山流護身術・逮捕術 東京八王子本部道場"
   description="世界各国から集まった仲間たちが、守破離の精神のもとで共に稽古に励んでいます。国籍・年齢・経験を超えた絆が、泰山流道場を一層豊かなものにしています。"
 >
-
-  <!-- タイトルセクション -->
-  <section class="title">
-    <div class="inner">
-      <div class="title-content reveal">
-        <p class="eyebrow">Taizan-ryu</p>
-        <h1 class="title-text"><span class="ja">友好関係の道場</span><span class="en">Affiliated Dojos</span></h1>
-        <p class="title-sub">Affiliated Dojos</p>
-        <div class="divider"></div>
-        <p class="title-desc ja">
-          世界各国から集まった仲間たちが、守破離の精神のもとで共に稽古に励んでいます。
-          国籍・年齢・経験を超えた絆が、泰山流道場を一層豊かなものにしています。
-        </p>
-        <p class="title-desc en">
-          Students from around the world train together in the spirit of Shu-Ha-Ri.
-          Bonds that transcend nationality, age, and experience make Taizan-ryu Dojo all the richer.
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ヒーローセクション -->
-  <section class="hero">
-    <img
-      src={images.logoImage}
-      alt="友好関係の道場"
-      class="hero-bg"
-    />
-    <div class="hero-overlay"></div>
-  </section>
+  <!-- ヒーロー -->
+  <HeroCarousel images={images.selfDefenseHeroBgs.slice(0, 2)} alt="泰山流護身術" shuffle interval={6000}>
+    <p class="sd-eyebrow">Taizan-ryu</p>
+    <h1 class="sh-hero-title">
+      <span class="line-a">
+        <span class="ja">友好関係の道場</span>
+        <span class="en">Affiliated Dojos</span>
+      </span>
+    </h1>
+    <p class="sd-hero-sub">
+      <span class="ja">
+        世界各国から集まった仲間たちが、守破離の精神のもとで共に稽古に励んでいます。<br>
+        国籍・年齢・経験を超えた絆が、泰山流道場を一層豊かなものにしています。
+      </span>
+      <span class="en">
+        Students from around the world train together in the spirit of Shu-Ha-Ri.<br>
+        Bonds that transcend nationality, age, and experience make Taizan-ryu Dojo all the richer.
+      </span>
+    </p>
+  </HeroCarousel> 
 
   <!-- リストセクション -->
   <section class="list">
@@ -371,24 +363,6 @@ const dojos = [
     box-shadow: 0 10px 20px rgba(56, 189, 248, 0.3);
   }
 
-  .btn-secondary {
-    display: inline-block;
-    align-self: flex-start;
-    margin-top: 8px;
-    padding: 10px 28px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 24px;
-    font-size: 0.82rem;
-    letter-spacing: 1px;
-    color: var(--text-primary);
-    transition: background-color 0.3s ease, border-color 0.3s ease;
-  }
-
-  .btn-secondary:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.5);
-  }
-
   /* ===== CTA ===== */
   .cta {
     padding: 100px 0;
@@ -410,23 +384,6 @@ const dojos = [
     line-height: 1.8;
   }
 
-  .btn-primary {
-    display: inline-block;
-    padding: 16px 48px;
-    background-color: #fff;
-    color: #1a120d;
-    border-radius: 30px;
-    font-weight: 600;
-    font-size: 0.95rem;
-    letter-spacing: 1px;
-    transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
-  }
-
-  .btn-primary:hover {
-    background-color: var(--bg-color-secondary);
-    transform: translateY(-3px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
-  }
 
   /* ===== レスポンシブ ===== */
   @media (max-width: 900px) {
@@ -469,5 +426,13 @@ const dojos = [
     .grid {
       gap: 24px;
     }
+  }
+</style>
+
+<style is:global>
+  .hero-carousel .sd-hero-sub {
+    font-size: clamp(1rem, 2.5vw, 1.5rem);
+    letter-spacing: 2px;
+    line-height: 1.9;
   }
 </style>

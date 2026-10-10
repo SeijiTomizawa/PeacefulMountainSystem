@@ -1,85 +1,91 @@
 ---
 import Base from "../layouts/Base.astro";
-import {
-  aichiSeminar1, aichiSeminar2, aichiSeminar3, aichiSeminar4, aichiSeminar5,
-  aichiSeminar6, aichiSeminar7, aichiSeminar8, aichiSeminar9, aichiSeminar11,
-  newyorkSeminar1, newyorkSeminar2, newyorkSeminar3, newyorkSeminar4, newyorkSeminar5,
-  newyorkSeminar6, newyorkSeminar7, newyorkSeminar8, newyorkSeminar9, newyorkSeminar10,
-  newyorkSeminar11, newyorkSeminar12, newyorkSeminar13,
-} from "../components/blocks/images";
+import { aichiSeminar, newyorkSeminar } from "../components/blocks/images";
 
-const R2 = "https://pub-488a24026ed4411b8d591260b603cdd1.r2.dev";
-
-const photos = [
-  { src: `${R2}/dojo/DOJO_04.webp`,             alt: "道場稽古",                  aspect: "wide" },
-  { src: `${R2}/dojo/DOJO_05.webp`,             alt: "柔術稽古",                  aspect: "tall" },
-  { src: `${R2}/dojo/DOJO_07.webp`,             alt: "組手稽古",                  aspect: "wide" },
-  { src: `${R2}/dojo/DOJO_08.webp`,             alt: "道場風景",                  aspect: "tall" },
-  { src: `${R2}/shiatsu/SHIATSU_DO_02.webp`,    alt: "指圧施術",                  aspect: "square" },
-  { src: `${R2}/biography/SOKE_JOE_MILLER.webp`,alt: "宗家ジョー・ミラー",        aspect: "tall" },
-  { src: `${R2}/parts/big-photo0000-6654.jpg`,  alt: "八王子道場",                aspect: "wide" },
-  { src: aichiSeminar1,                          alt: "愛知セミナー 2025",          aspect: "wide" },
-  { src: aichiSeminar2,                          alt: "愛知セミナー 2025",          aspect: "tall" },
-  { src: aichiSeminar3,                          alt: "愛知セミナー 2025",          aspect: "wide" },
-  { src: aichiSeminar4,                          alt: "愛知セミナー 2025",          aspect: "square" },
-  { src: aichiSeminar5,                          alt: "愛知セミナー 2025",          aspect: "tall" },
-  { src: aichiSeminar6,                          alt: "愛知セミナー 2025",          aspect: "wide" },
-  { src: aichiSeminar7,                          alt: "愛知セミナー 2025",          aspect: "tall" },
-  { src: aichiSeminar8,                          alt: "愛知セミナー 2025",          aspect: "wide" },
-  { src: aichiSeminar9,                          alt: "愛知セミナー 2025",          aspect: "square" },
-  { src: aichiSeminar11,                         alt: "愛知セミナー 2025",          aspect: "tall" },
-  { src: newyorkSeminar1,                        alt: "ニューヨークセミナー 2023",  aspect: "wide" },
-  { src: newyorkSeminar2,                        alt: "ニューヨークセミナー 2023",  aspect: "tall" },
-  { src: newyorkSeminar3,                        alt: "ニューヨークセミナー 2023",  aspect: "wide" },
-  { src: newyorkSeminar4,                        alt: "ニューヨークセミナー 2023",  aspect: "square" },
-  { src: newyorkSeminar5,                        alt: "ニューヨークセミナー 2023",  aspect: "tall" },
-  { src: newyorkSeminar6,                        alt: "ニューヨークセミナー 2023",  aspect: "wide" },
-  { src: newyorkSeminar7,                        alt: "ニューヨークセミナー 2023",  aspect: "tall" },
-  { src: newyorkSeminar8,                        alt: "ニューヨークセミナー 2023",  aspect: "wide" },
-  { src: newyorkSeminar9,                        alt: "ニューヨークセミナー 2023",  aspect: "square" },
-  { src: newyorkSeminar10,                       alt: "ニューヨークセミナー 2023",  aspect: "tall" },
-  { src: newyorkSeminar11,                       alt: "ニューヨークセミナー 2023",  aspect: "wide" },
-  { src: newyorkSeminar12,                       alt: "ニューヨークセミナー 2023",  aspect: "tall" },
-  { src: newyorkSeminar13,                       alt: "ニューヨークセミナー 2023",  aspect: "wide" },
+const seminars = [
+  {
+    id: "aichi-2025",
+    titleJa: "愛知セミナー 2025",
+    titleEn: "Aichi Seminar 2025",
+    dateJa: "2025年",
+    location: "愛知県",
+    photos: aichiSeminar.filter((_, i) => i !== 9),
+  },
+  {
+    id: "newyork-2023",
+    titleJa: "ニューヨークセミナー 2023",
+    titleEn: "New York Seminar 2023",
+    dateJa: "2023年",
+    location: "New York, USA",
+    photos: newyorkSeminar,
+  },
 ];
+
 ---
 
 <Base
   title="大会写真"
-  description="泰山流護身術・逮捕術 — 道場での稽古・演武・大会の様子をご覧ください。"
+  description="泰山流護身術・逮捕術 — 愛知セミナー・ニューヨークセミナーの様子をご覧ください。"
 >
 
-  <!-- タイトルセクション -->
-  <section class="ep-title">
-    <div class="ep-title-inner reveal">
+  <!-- ヒーローセクション -->
+  <section class="ep-hero">
+    <div class="ep-hero-bg" style={`background-image: url(${aichiSeminar[0]})`}></div>
+    <div class="ep-hero-overlay"></div>
+    <div class="ep-hero-inner reveal">
       <p class="ep-eyebrow">Taizan-ryu</p>
-      <h1 class="ep-title-text"><span class="ja">大会写真</span><span class="en">Event Photos</span></h1>
-      <p class="ep-title-sub">Event Photos</p>
+      <h1 class="ep-hero-title"><span class="ja">大会写真</span><span class="en">Event Photos</span></h1>
       <div class="ep-divider"></div>
-      <p class="ep-title-desc ja">稽古・演武・大会の様子をご紹介します。</p>
-      <p class="ep-title-desc en">Showcasing training sessions, demonstrations, and events.</p>
+      <p class="ep-hero-desc ja">セミナー・大会での稽古と演武の記録。</p>
+      <p class="ep-hero-desc en">A record of training and demonstrations at seminars and events.</p>
     </div>
   </section>
 
-  <!-- マソンリーグリッド -->
-  <section class="ep-gallery">
-    <div class="ep-masonry">
-      {photos.map((photo, i) => (
-        <div
-          class={`ep-item ep-item--${photo.aspect} reveal`}
-          data-index={i}
-          data-src={photo.src}
-          data-alt={photo.alt}
-          style={`animation-delay: ${(i % 6) * 80}ms`}
-        >
-          <img src={photo.src} alt={photo.alt} loading="lazy" />
-          <div class="ep-item-overlay">
-            <span class="ep-item-icon">⊕</span>
+  <!-- セミナーギャラリーセクション -->
+  {seminars.map((seminar, si) => {
+    const offset = seminars.slice(0, si).reduce((acc, s) => acc + s.photos.length, 0);
+    return (
+      <section class={`ep-seminar ${si % 2 === 1 ? "ep-seminar--alt" : ""}`} id={seminar.id}>
+        <div class="ep-seminar-inner">
+          <div class="ep-seminar-header reveal">
+            <div class="ep-seminar-meta">
+              <span class="ep-seminar-date">{seminar.dateJa}</span>
+              <span class="ep-seminar-sep">—</span>
+              <span class="ep-seminar-location">{seminar.location}</span>
+            </div>
+            <h2 class="ep-seminar-title">
+              <span class="ja">{seminar.titleJa}</span>
+              <span class="en">{seminar.titleEn}</span>
+            </h2>
+          </div>
+
+          <div class="ep-masonry">
+            {seminar.photos.map((src, i) => {
+              const globalIndex = offset + i;
+              return (
+                <div
+                  class="ep-item reveal"
+                  data-index={globalIndex}
+                  data-src={src}
+                  data-alt={`${seminar.titleJa} ${i + 1}`}
+                  style={`animation-delay: ${(i % 6) * 80}ms`}
+                >
+                  <img src={src} alt={`${seminar.titleJa} ${i + 1}`} loading="lazy" />
+                  <div class="ep-item-overlay">
+                    <span class="ep-item-icon">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                      </svg>
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
-      ))}
-    </div>
-  </section>
+      </section>
+    );
+  })}
 
   <!-- ライトボックス -->
   <div class="ep-lightbox" id="ep-lightbox" aria-hidden="true">
@@ -96,7 +102,7 @@ const photos = [
 </Base>
 
 <script>
-  const photos = Array.from(document.querySelectorAll<HTMLElement>('.ep-item'));
+  const items    = Array.from(document.querySelectorAll<HTMLElement>('.ep-item'));
   const lightbox  = document.getElementById('ep-lightbox')!;
   const lbImg     = document.getElementById('ep-lb-img') as HTMLImageElement;
   const lbCaption = document.getElementById('ep-lb-caption')!;
@@ -109,11 +115,11 @@ const photos = [
 
   function open(index: number) {
     current = index;
-    const item = photos[index];
-    lbImg.src        = item.dataset.src ?? '';
-    lbImg.alt        = item.dataset.alt ?? '';
+    const item = items[index];
+    lbImg.src = item.dataset.src ?? '';
+    lbImg.alt = item.dataset.alt ?? '';
     lbCaption.textContent = item.dataset.alt ?? '';
-    lbCounter.textContent = `${index + 1} / ${photos.length}`;
+    lbCounter.textContent = `${index + 1} / ${items.length}`;
     lightbox.classList.add('ep-lightbox--open');
     lightbox.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
@@ -125,20 +131,18 @@ const photos = [
     document.body.style.overflow = '';
   }
 
-  function prev() { open((current - 1 + photos.length) % photos.length); }
-  function next() { open((current + 1) % photos.length); }
+  function prev() { open((current - 1 + items.length) % items.length); }
+  function next() { open((current + 1) % items.length); }
 
-  photos.forEach((item, i) => item.addEventListener('click', () => open(i)));
+  items.forEach((item, i) => item.addEventListener('click', () => open(i)));
   lbClose.addEventListener('click', close);
   lbPrev.addEventListener('click', prev);
   lbNext.addEventListener('click', next);
 
-  // オーバーレイクリックで閉じる
   lightbox.addEventListener('click', (e) => {
     if (e.target === lightbox || (e.target as HTMLElement).classList.contains('ep-lb-stage')) close();
   });
 
-  // キーボード操作
   document.addEventListener('keydown', (e) => {
     if (!lightbox.classList.contains('ep-lightbox--open')) return;
     if (e.key === 'Escape')     close();
@@ -148,117 +152,199 @@ const photos = [
 </script>
 
 <style>
-  /* ===== タイトル ===== */
-  .ep-title {
-    padding: calc(var(--header-height) + 80px) 0 72px;
-    background-color: var(--bg-color);
+  /* ===== ヒーロー ===== */
+  .ep-hero {
+    position: relative;
+    height: calc(var(--header-height) + 480px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     text-align: center;
+    overflow: hidden;
   }
 
-  .ep-title-inner {
-    max-width: 520px;
+  .ep-hero-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    transform: scale(1.05);
+    transition: transform 8s ease;
+  }
+
+  .ep-hero:hover .ep-hero-bg {
+    transform: scale(1.0);
+  }
+
+  .ep-hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.55) 0%,
+      rgba(0, 0, 0, 0.65) 60%,
+      rgba(0, 0, 0, 0.85) 100%
+    );
+  }
+
+  .ep-hero-inner {
+    position: relative;
+    z-index: 1;
+    padding: calc(var(--header-height) + 20px) 24px 48px;
+    max-width: 600px;
     margin: 0 auto;
-    padding: 0 20px;
   }
 
   .ep-eyebrow {
-    font-size: 0.8rem;
-    letter-spacing: 5px;
+    font-size: 0.75rem;
+    letter-spacing: 6px;
     text-transform: uppercase;
-    color: var(--text-secondary);
+    color: rgba(255, 255, 255, 0.55);
     margin-bottom: 20px;
   }
 
-  .ep-title-text {
+  .ep-hero-title {
     font-size: clamp(3rem, 6vw, 5rem);
     font-weight: 600;
     letter-spacing: 8px;
     line-height: 1;
-    margin-bottom: 12px;
-  }
-
-  .ep-title-sub {
-    font-size: 0.85rem;
-    letter-spacing: 5px;
-    color: var(--text-secondary);
-    margin-bottom: 36px;
+    margin-bottom: 32px;
   }
 
   .ep-divider {
     width: 40px;
     height: 1px;
-    background-color: rgba(255, 255, 255, 0.25);
-    margin: 0 auto 36px;
+    background-color: rgba(255, 255, 255, 0.3);
+    margin: 0 auto 28px;
   }
 
-  .ep-title-desc {
+  .ep-hero-desc {
     font-size: 0.9rem;
     line-height: 1.8;
-    color: var(--text-secondary);
+    color: rgba(255, 255, 255, 0.6);
     letter-spacing: 1px;
   }
 
-  /* ===== マソンリーグリッド ===== */
-  .ep-gallery {
-    padding: 0 0 80px;
+  /* ===== セミナーセクション ===== */
+  .ep-seminar {
+    padding: 80px 0 100px;
     background-color: var(--bg-color);
   }
 
-  .ep-masonry {
-    column-count: 3;
-    column-gap: 8px;
+  .ep-seminar--alt {
+    background-color: var(--surface-dark, #111);
+  }
+
+  .ep-seminar-inner {
     max-width: 1400px;
     margin: 0 auto;
     padding: 0 24px;
   }
 
-  /* ===== 各アイテム ===== */
-  .ep-item {
-    break-inside: avoid;
-    margin-bottom: 8px;
-    position: relative;
-    overflow: hidden;
-    border-radius: 4px;
-    cursor: pointer;
+  .ep-seminar-header {
+    margin-bottom: 48px;
+    text-align: center;
   }
 
-  /* アスペクト比のヒント — 実際の画像の高さに従う */
-  .ep-item img {
-    width: 100%;
-    display: block;
-    transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
-  }
-
-  /* ホバーオーバーレイ */
-  .ep-item-overlay {
-    position: absolute;
-    inset: 0;
-    background-color: rgba(107, 31, 35, 0.0);
+  .ep-seminar-meta {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background-color 0.35s ease;
+    gap: 12px;
+    font-size: 0.78rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
   }
 
-  .ep-item-icon {
-    font-size: 2rem;
-    color: #fff;
+  .ep-seminar-sep {
+    opacity: 0.4;
+  }
+
+  .ep-seminar-title {
+    font-size: clamp(1.6rem, 3vw, 2.4rem);
+    font-weight: 600;
+    letter-spacing: 4px;
+    line-height: 1.2;
+  }
+
+  /* ===== マソンリーグリッド ===== */
+  .ep-masonry {
+    column-count: 3;
+    column-gap: 12px;
+  }
+
+  .ep-item {
+    break-inside: avoid;
+    margin-bottom: 12px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 16px;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
+                box-shadow 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .ep-item img {
+    width: 100%;
+    display: block;
+    transition: transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1),
+                filter 0.55s ease;
+    filter: brightness(0.95) saturate(1.05);
+  }
+
+  /* 下からフェードするグラデーションオーバーレイ */
+  .ep-item-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top,
+      rgba(107, 31, 35, 0.75) 0%,
+      rgba(107, 31, 35, 0.15) 45%,
+      transparent 70%
+    );
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 16px 18px;
     opacity: 0;
-    transform: scale(0.7);
-    transition: opacity 0.3s ease, transform 0.3s ease;
+    transition: opacity 0.4s ease;
+  }
+
+  /* 虫眼鏡アイコン（SVG） */
+  .ep-item-icon {
+    width: 36px;
+    height: 36px;
+    border: 1.5px solid rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 1rem;
+    flex-shrink: 0;
+    transform: translateY(8px);
+    transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .ep-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.55);
   }
 
   .ep-item:hover img {
-    transform: scale(1.05);
+    transform: scale(1.07);
+    filter: brightness(1.05) saturate(1.15);
   }
 
   .ep-item:hover .ep-item-overlay {
-    background-color: rgba(107, 31, 35, 0.45);
+    opacity: 1;
   }
 
   .ep-item:hover .ep-item-icon {
-    opacity: 1;
-    transform: scale(1);
+    transform: translateY(0);
   }
 
   /* ===== ライトボックス ===== */
@@ -315,7 +401,6 @@ const photos = [
     margin: 0 0 24px;
   }
 
-  /* 閉じるボタン */
   .ep-lb-close {
     position: absolute;
     top: 20px;
@@ -336,7 +421,6 @@ const photos = [
     transform: scale(1.1);
   }
 
-  /* 前後ボタン */
   .ep-lb-prev,
   .ep-lb-next {
     position: absolute;
@@ -371,16 +455,30 @@ const photos = [
   }
 
   @media (max-width: 600px) {
-    .ep-masonry {
-      column-count: 2;
-      column-gap: 4px;
-      padding: 0 8px;
+    .ep-hero {
+      height: calc(var(--header-height) + 360px);
     }
 
-    .ep-item { margin-bottom: 4px; }
+    .ep-seminar {
+      padding: 56px 0 72px;
+    }
 
-    .ep-title {
-      padding: calc(var(--header-height) + 48px) 0 48px;
+    .ep-seminar-inner {
+      padding: 0 12px;
+    }
+
+    .ep-seminar-header {
+      margin-bottom: 32px;
+    }
+
+    .ep-masonry {
+      column-count: 2;
+      column-gap: 8px;
+    }
+
+    .ep-item {
+      margin-bottom: 8px;
+      border-radius: 10px;
     }
 
     .ep-lb-stage { padding: 60px 16px 16px; }

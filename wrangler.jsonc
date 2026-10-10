@@ -1,67 +1,18 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "taizanryu-site",
-	"main": "./src/worker.ts",
+	"pages_build_output_dir": "dist",
 	"compatibility_date": "2026-03-29",
 	"compatibility_flags": [
 		"nodejs_compat"
-	],
-	"d1_databases": [
-		{
-			"binding": "DB",
-			"database_name": "taizanryu-site-db","database_id": "8059dca9-c895-4dc7-9e0e-417630e1e20d",
-			// Run `wrangler d1 create my-marketing-site` and paste the ID here
-		},
-	],
-	"r2_buckets": [
-		{
-			"binding": "MEDIA",
-			"bucket_name": "taizanryu-site-media","preview_bucket_name": "taizanryu-site-media",
-		},
 	],
 	"observability": {
 		"enabled": true,
 	},
 	"vars": {
-		// 本番では `wrangler secret put RESEND_API_KEY` でシークレットとして設定する
-		"RESEND_API_KEY": "",
+		// RESEND_API_KEY は Cloudflare Pages ダッシュボードまたは
+		// `wrangler pages secret put RESEND_API_KEY --project-name taizanryu-site` で設定する
 		"CONTACT_FROM_EMAIL": "contact@peacefulmountainsystem.com",
 		"CONTACT_TO_EMAIL": "uilriku59jp@yahoo.co.jp",
-	},
-	"worker_loaders": [
-		{
-			"binding": "LOADER",
-		},
-	],
-
-	"env": {
-		"dev": {
-			"name": "taizanryu-site-dev",
-			"d1_databases": [
-				{
-					"binding": "DB",
-					"database_name": "taizanryu-site-db-dev",
-					"database_id": "4720e1be-b6f6-4714-bfee-0a41a7e98d45",
-				},
-			],
-			"r2_buckets": [
-				{
-					"binding": "MEDIA",
-					"bucket_name": "taizanryu-site-media",
-					"preview_bucket_name": "taizanryu-site-media",
-				},
-			],
-			"vars": {
-				// 開発環境: `wrangler secret put RESEND_API_KEY --env dev` でシークレットとして設定する
-				"RESEND_API_KEY": "",
-				"CONTACT_FROM_EMAIL": "contact@peacefulmountainsystem.com",
-				"CONTACT_TO_EMAIL": "uilriku59jp@yahoo.co.jp",
-			},
-			"worker_loaders": [
-				{
-					"binding": "LOADER",
-				},
-			],
-		},
 	},
 }

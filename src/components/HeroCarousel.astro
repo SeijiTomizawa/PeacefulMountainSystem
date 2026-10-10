@@ -1,0 +1,211 @@
+---
+interface Props {
+  images: string[];
+  alt?: string;
+  interval?: number;
+  shuffle?: boolean;
+  objectPosition?: string;
+}
+
+const { images, alt = '', interval = 5000, shuffle = false, objectPosition = 'center center' } = Astro.props;
+---
+
+<section class="hero-carousel" data-interval={interval} data-shuffle={shuffle || undefined}>
+  <div class="carousel-images">
+    {images.map((src, i) => (
+      <img
+        src={src}
+        alt={alt}
+        class={`carousel-slide${i === 0 ? ' active' : ''}`}
+        style={`object-position: ${objectPosition}`}
+        {...(i === 0 ? { fetchpriority: 'high' } : { loading: 'lazy' })}
+        decoding="async"
+      />
+    ))}
+  </div>
+  <div class="carousel-overlay"></div>
+  <div class="carousel-content">
+    <!--
+      ===== スロットの使い方テンプレート =====
+
+      <p class="sd-eyebrow">Taizan-ryu</p>
+
+      <h1 class="sh-hero-title">
+        <span class="line-a">
+          <span class="ja">タイトル</span>
+          <span class="en">Title</span>
+        </span>
+        <span class="line-b">
+          <span class="ja">サブタイトル（省略可）</span>
+          <span class="en">Subtitle (optional)</span>
+        </span>
+      </h1>
+
+      <p class="sd-hero-sub">
+        <span class="ja">短いキャッチコピー</span>
+        <span class="en">Short tagline</span>
+      </p>
+
+      <p class="hero-desc">
+        <span class="ja">より長い説明文をここに書きます。<br>改行も使えます。</span>
+        <span class="en">Longer description text goes here.<br>Line breaks are supported.</span>
+      </p>
+    -->
+    <slot />
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.hero-carousel').forEach((carousel) => {
+    const container = carousel.querySelector<HTMLElement>('.carousel-images')!;
+    let slides = Array.from(carousel.querySelectorAll<HTMLElement>('.carousel-slide'));
+    if (slides.length <= 1) return;
+
+    if (carousel.dataset.shuffle !== undefined) {
+      // Fisher-Yates shuffle
+      for (let i = slides.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [slides[i], slides[j]] = [slides[j], slides[i]];
+      }
+      slides.forEach(s => { s.classList.remove('active'); container.appendChild(s); });
+      slides[0].classList.add('active');
+    }
+
+    const ms = Number(carousel.dataset.interval) || 5000;
+    let current = 0;
+    setInterval(() => {
+      slides[current].classList.remove('active');
+      current = (current + 1) % slides.length;
+      slides[current].classList.add('active');
+    }, ms);
+  });
+</script>
+
+<style>
+  .hero-carousel {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    left: 50%;
+    transform: translateX(-50%);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .carousel-images {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+
+  .carousel-slide {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 1.5s ease-in-out;
+  }
+
+  .carousel-slide.active {
+    opacity: 1;
+  }
+
+  .carousel-overlay {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 2;
+  }
+
+  .carousel-content {
+    position: relative;
+    z-index: 3;
+    text-align: center;
+    color: #ffffff;
+    padding: 0 20px;
+  }
+
+  @media (max-width: 600px) {
+    .carousel-content { padding: 0 16px; }
+  }
+</style>
+
+<!-- スロットコンテンツ用グローバルスタイル -->
+<!-- is:global を使うことで @keyframes 名がハッシュ化されず、親ページのスコープを超えて適用される -->
+<style is:global>
+  .hero-carousel .carousel-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .hero-carousel .sd-eyebrow,
+  .hero-carousel .sh-eyebrow {
+    font-size: 1.2rem;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.55);
+    margin-bottom: 20px;
+    opacity: 0;
+    animation: carouselFadeUp 0.8s ease 0.2s forwards;
+  }
+
+  .hero-carousel .sh-hero-title {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  .hero-carousel .line-a {
+    font-size: clamp(3rem, 8vw, 6rem);
+    font-weight: 600;
+    letter-spacing: 6px;
+    line-height: 1.1;
+    text-shadow: 0 2px 40px rgba(0, 0, 0, 0.6);
+    opacity: 0;
+    animation: carouselFadeUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) 0.5s forwards;
+  }
+
+  .hero-carousel .line-b {
+    font-size: clamp(1.8rem, 4.5vw, 3.5rem);
+    font-weight: 300;
+    letter-spacing: 8px;
+    color: rgba(255, 255, 255, 0.8);
+    opacity: 0;
+    animation: carouselFadeUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) 0.7s forwards;
+  }
+
+  .hero-carousel .sd-hero-sub,
+  .hero-carousel .sh-hero-sub {
+    font-size: 1.85rem;
+    letter-spacing: 3px;
+    color: rgba(255, 255, 255, 0.6);
+    line-height: 1.8;
+    opacity: 0;
+    animation: carouselFadeUp 0.8s ease 0.9s forwards;
+  }
+
+  /* 説明文（.hero-desc） — サブテキストの下に表示 */
+  .hero-carousel .hero-desc {
+    max-width: 600px;
+    margin-top: 20px;
+    font-size: 1.25rem;
+    line-height: 2;
+    color: rgba(255, 255, 255, 0.55);
+    letter-spacing: 0.5px;
+    text-align: center;
+    opacity: 0;
+    animation: carouselFadeUp 0.8s ease 1.2s forwards;
+  }
+
+  @keyframes carouselFadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+</style>

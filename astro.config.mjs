@@ -1,30 +1,24 @@
-import cloudflare from "@astrojs/cloudflare";
 import react from "@astrojs/react";
-import { d1, r2, sandbox } from "@emdash-cms/cloudflare";
 import { defineConfig } from "astro/config";
-import emdash from "emdash/astro";
 
 export default defineConfig({
-	output: "server",
-	adapter: cloudflare(),
+	site: "https://peacefulmountainsystem.com",
+	output: "static",
 	image: {
 		layout: "constrained",
 		responsiveStyles: true,
 	},
 	integrations: [
 		react(),
-		emdash({
-			database: d1({ binding: "DB", session: "auto" }),
-			storage: r2({ binding: "MEDIA" }),
-			sandboxRunner: sandbox(),
-		}),
 	],
-	experimental: {
-		cache: {
-			provider: {
-				entrypoint: "astro/cache/memory",
+	devToolbar: { enabled: false },
+	vite: {
+		server: {
+			hmr: {
+				protocol: 'ws',
+				host: 'localhost',
+				clientPort: 4321,
 			},
 		},
 	},
-	devToolbar: { enabled: false },
 });
